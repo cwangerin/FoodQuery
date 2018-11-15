@@ -48,4 +48,4 @@ https://pages.cs.wisc.edu/~deppeler/cs400/assignments/p5/files/
 
 D-Team 18 Contact Info:
 
-Bernard Rufinus - 856-381-1951 - brufinus@wisc.edu
+* Bernard Rufinus - 856-381-1951 - brufinus@wisc.edu
