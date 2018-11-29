@@ -27,6 +27,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -56,7 +57,23 @@ public class Main extends Application {
 			//calorieInput = new TextField();
 			nameFilter = new TextField();
 			vbox.getChildren().add(getData());
+
+
+
+			//spacing and padding start
+			hbox.setPadding(new Insets(10,5,5,10));
+			hbox.setSpacing(10);
 			
+			hbox2.setPadding(new Insets(10,10,5,10));
+			hbox2.setSpacing(10);
+			
+			vbox.setPadding(new Insets(5,5,5,5));
+			//spacing and padding end
+
+			//command sets color of list view
+			listView.setStyle("-fx-control-inner-background: #DCF3FF");		
+
+
 			// Drop down menu
 			FileChooser fileChooser = new FileChooser();
 //			fileChooser.setTitle();
@@ -125,8 +142,10 @@ public class Main extends Application {
 			vbox.getChildren().add(listView);
 		    vbox.getChildren().add(hbox);
 		    vbox.getChildren().add(hbox2);
-		    vbox.setStyle("-fx-background-color: red");
 		    
+			 //sets style for background for the entire box
+		    vbox.setStyle("-fx-background-color: #7aadff");
+
 		    root.setTop(dropMenuPanel);
 		    root.setRight(vbox);
 		    
