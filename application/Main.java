@@ -9,14 +9,19 @@ import java.util.Scanner;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuBar;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -33,6 +38,8 @@ public class Main extends Application {
 	ArrayList<String> food;
 	TextField foodInput,calorieInput, nameFilter;
 	TableView table;
+	MenuBar dropMenu;
+	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -49,6 +56,25 @@ public class Main extends Application {
 			//calorieInput = new TextField();
 			nameFilter = new TextField();
 			vbox.getChildren().add(getData());
+			
+			// Drop down menu
+			FileChooser fileChooser = new FileChooser();
+//			fileChooser.setTitle();
+//			fileChooser.showOpenDialog(primaryStage);
+			
+			dropMenu = new MenuBar();
+			Menu menuFile = new Menu("File");
+			menuFile.setOnShowing(e -> {  }); // TODO: Add events
+			menuFile.setOnShown  (e -> {  });
+			menuFile.setOnHiding (e -> {  });
+			menuFile.setOnHidden (e -> {  });
+			MenuItem menuItemFile = new MenuItem("Load File");
+			menuItemFile.setOnAction(e -> {
+			    fileChooser.showOpenDialog(primaryStage);
+			});
+			menuFile.getItems().add(menuItemFile);
+			dropMenu.getMenus().add(menuFile);
+			VBox dropMenuPanel = new VBox(dropMenu);
 			
 			/**
 			TableColumn foodColumn = new TableColumn("Food");
@@ -101,8 +127,10 @@ public class Main extends Application {
 		    vbox.getChildren().add(hbox2);
 		    vbox.setStyle("-fx-background-color: red");
 		    
+		    root.setTop(dropMenuPanel);
 		    root.setRight(vbox);
 		    
+		    // Setting scene to stage and displaying stage.
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 		    primaryStage.setScene(scene);
 			primaryStage.show();
@@ -114,7 +142,7 @@ public class Main extends Application {
 		HBox hbox = new HBox();
 		Button btn = new Button("Upload Data");
 		TextField text = new TextField();
-		text.setPromptText("file");
+		text.setPromptText("Food input file");
 		
 		btn.setOnAction((ActionEvent e) -> {
 			String filename = text.getText();
@@ -130,7 +158,7 @@ public class Main extends Application {
 				e1.printStackTrace();
 			}
 		});
-		hbox.getChildren().add(new Label("import:"));
+		hbox.getChildren().add(new Label("Food List:"));
 		hbox.getChildren().add(text);
 	    hbox.getChildren().add(btn);
 	    hbox.setSpacing(10);
