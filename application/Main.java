@@ -9,25 +9,20 @@ import java.util.Scanner;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
-import javafx.geometry.Insets;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -39,8 +34,6 @@ public class Main extends Application {
 	ArrayList<String> food;
 	TextField foodInput,calorieInput, nameFilter;
 	TableView table;
-	MenuBar dropMenu;
-	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
@@ -56,42 +49,11 @@ public class Main extends Application {
 			foodInput = new TextField();
 			//calorieInput = new TextField();
 			nameFilter = new TextField();
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
 			vbox.getChildren().add(getData());
-
-
-
-			//spacing and padding start
-			hbox.setPadding(new Insets(10,5,5,10));
-			hbox.setSpacing(10);
 			
-			hbox2.setPadding(new Insets(10,10,5,10));
-			hbox2.setSpacing(10);
 			
-			vbox.setPadding(new Insets(5,5,5,5));
-			//spacing and padding end
-
-			//command sets color of list view
-			listView.setStyle("-fx-control-inner-background: #DCF3FF");		
-
-
-			// Drop down menu
-			FileChooser fileChooser = new FileChooser();
-//			fileChooser.setTitle();
-//			fileChooser.showOpenDialog(primaryStage);
 			
-			dropMenu = new MenuBar();
-			Menu menuFile = new Menu("File");
-			menuFile.setOnShowing(e -> {  }); // TODO: Add events
-			menuFile.setOnShown  (e -> {  });
-			menuFile.setOnHiding (e -> {  });
-			menuFile.setOnHidden (e -> {  });
-			MenuItem menuItemFile = new MenuItem("Load File");
-			menuItemFile.setOnAction(e -> {
-			    fileChooser.showOpenDialog(primaryStage);
-			});
-			menuFile.getItems().add(menuItemFile);
-			dropMenu.getMenus().add(menuFile);
-			VBox dropMenuPanel = new VBox(dropMenu);
 			
 			/**
 			TableColumn foodColumn = new TableColumn("Food");
@@ -113,8 +75,43 @@ public class Main extends Application {
 			hbox2.getChildren().addAll(nameFilter,nameFilterButton, nameUnfilterButton);
 			//hbox.getChildren().addAll(foodInput, calorieInput, addButton, deleteButton);
 			addButton.setOnAction((ActionEvent e) -> {
-				listView.getItems().add(foodInput.getText());
-				foodInput.clear();
+				//if(!(foodInput.getText().equals(""))) {
+				//	listView.getItems().add(foodInput.getText());
+				//}
+				//foodInput.clear();
+				Stage addFoodWindow = new Stage();
+				BorderPane bp2 = new BorderPane();
+				VBox vbox2 = new VBox();
+				TextField foodName = new TextField();
+				TextField calorieCount = new TextField();
+				TextField fatGrams = new TextField();
+				TextField carbGrams = new TextField();
+				TextField fiberGrams = new TextField();
+				TextField proteinGrams = new TextField();
+				Label title = new Label();
+				title.setText("Add food item with its nutrients");
+				foodName.setPromptText("food name");
+				calorieCount.setPromptText("calorie count");
+				fatGrams.setPromptText("fat grams");
+				carbGrams.setPromptText("carbohydrate grams");
+				fiberGrams.setPromptText("fiber grams");
+				proteinGrams.setPromptText("protein grams");
+				foodName.setFocusTraversable(false);
+				calorieCount.setFocusTraversable(false);
+				fatGrams.setFocusTraversable(false);
+				carbGrams.setFocusTraversable(false);
+				fiberGrams.setFocusTraversable(false);
+				proteinGrams.setFocusTraversable(false);
+				Button submit = new Button("submit");
+				submit.setOnAction(r -> addFoodWindow.close());
+				vbox2.getChildren().addAll(title,foodName,calorieCount,fatGrams,
+						carbGrams,fiberGrams,proteinGrams,submit);
+				bp2.setCenter(vbox2);
+				Scene popupScene = new Scene(bp2, 750, 450);
+				addFoodWindow.setTitle("Add Food Item");
+				addFoodWindow.setScene(popupScene);
+				addFoodWindow.show();
+				
 			});
 			deleteButton.setOnAction((ActionEvent e) -> {
 				ObservableList<String> delete = listView.getSelectionModel().getSelectedItems();
@@ -142,15 +139,8 @@ public class Main extends Application {
 			vbox.getChildren().add(listView);
 		    vbox.getChildren().add(hbox);
 		    vbox.getChildren().add(hbox2);
-		    
-			 //sets style for background for the entire box
-		    vbox.setStyle("-fx-background-color: #7aadff");
-
-		    root.setTop(dropMenuPanel);
 		    root.setRight(vbox);
-		    
-		    // Setting scene to stage and displaying stage.
-			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		    vbox.setStyle("-fx-background-color: red");
 		    primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch(Exception e) {
@@ -161,8 +151,8 @@ public class Main extends Application {
 		HBox hbox = new HBox();
 		Button btn = new Button("Upload Data");
 		TextField text = new TextField();
-		text.setPromptText("Food input file");
-		
+		text.setPromptText("file");
+		text.setFocusTraversable(false);
 		btn.setOnAction((ActionEvent e) -> {
 			String filename = text.getText();
 			File file = new File(filename);
@@ -177,7 +167,7 @@ public class Main extends Application {
 				e1.printStackTrace();
 			}
 		});
-		hbox.getChildren().add(new Label("Food List:"));
+		hbox.getChildren().add(new Label("import:"));
 		hbox.getChildren().add(text);
 	    hbox.getChildren().add(btn);
 	    hbox.setSpacing(10);
