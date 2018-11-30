@@ -27,6 +27,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -51,6 +52,7 @@ public class Main extends Application {
 			HBox hbox = new HBox();
 			HBox hbox2 = new HBox();
 			Scene scene = new Scene(root,1280,720);
+			
 			food = new ArrayList();
 			foodListView = new ListView<>();
 			//table = new TableView();
@@ -72,9 +74,13 @@ public class Main extends Application {
 			
 			Button delMealItemButton = new Button("Delete");
 			
+			Label mealSummaryLabel = new Label("Meal Summary");
+			mealSummaryLabel.setStyle("-fx-font: 24 segoeui");
+			
 			vBoxLeft.getChildren().add(mealListLabel);
 			vBoxLeft.getChildren().add(mealListView);
 			vBoxLeft.getChildren().add(delMealItemButton);
+			vBoxLeft.getChildren().add(mealSummaryLabel);
 			
 			// Drop down menu - MenuBar
 			FileChooser fileChooser = new FileChooser();
@@ -96,6 +102,7 @@ public class Main extends Application {
 			menuFile.getItems().add(menuMealList);
 			dropMenu.getMenus().add(menuFile);
 			HBox dropMenuPanel = new HBox(dropMenu);
+			
 			
 			/**
 			TableColumn foodColumn = new TableColumn("Food");
@@ -154,8 +161,8 @@ public class Main extends Application {
 				addFoodWindow.setTitle("Add Food Item");
 				addFoodWindow.setScene(popupScene);
 				addFoodWindow.show();
-				
 			});
+			
 			deleteButton.setOnAction((ActionEvent e) -> {
 				ObservableList<String> delete = foodListView.getSelectionModel().getSelectedItems();
 				foodListView.getItems().removeAll(delete);
@@ -184,11 +191,43 @@ public class Main extends Application {
 			vBoxRight.getChildren().add(foodListView);
 		    vBoxRight.getChildren().add(hbox);
 		    vBoxRight.getChildren().add(hbox2);
-		    vBoxRight.setStyle("-fx-background-color: red");
+		    
+
+			//spacing and padding start
+			hbox.setPadding(new Insets(10,5,5,10));
+			hbox.setSpacing(10);
+			
+			hbox2.setPadding(new Insets(10,10,5,10));
+			hbox2.setSpacing(10);
+			
+			vBoxRight.setPadding(new Insets(5,5,5,5));
+			
+			
+			hbox.setPadding(new Insets(10,5,5,10));
+			hbox.setSpacing(10);
+			
+			
+			
+			vBoxLeft.setPadding(new Insets(5,5,5,5));
+			//spacing and padding end
+
+			//command sets color of list view
+			foodListView.setStyle("-fx-control-inner-background: #DCF3FF");	
+			 //sets style for background for the entire box
+		    vBoxRight.setStyle("-fx-background-color: #7aadff");
+		    dropMenuPanel.setStyle("-fx-background-color: #7aadff");
+		    vBoxLeft.setStyle("-fx-background-color: #7aadff");
+		    
 		    
 		    root.setTop(dropMenuPanel);
 		    root.setRight(vBoxRight);
 		    root.setLeft(vBoxLeft);
+		    
+		    
+		    //
+		    HBox centerBox = new HBox();
+		    centerBox.setStyle("-fx-background-color: #7aadff");
+		    root.setCenter(centerBox);
 		    
 		    // Setting scene to stage and displaying stage.
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
