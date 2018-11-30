@@ -118,8 +118,43 @@ public class Main extends Application {
 			hbox2.getChildren().addAll(nameFilter,nameFilterButton, nameUnfilterButton);
 			//hbox.getChildren().addAll(foodInput, calorieInput, addButton, deleteButton);
 			addButton.setOnAction((ActionEvent e) -> {
-				foodListView.getItems().add(foodInput.getText());
-				foodInput.clear();
+				//if(!(foodInput.getText().equals(""))) {
+				//	listView.getItems().add(foodInput.getText());
+				//}
+				//foodInput.clear();
+				Stage addFoodWindow = new Stage();
+				BorderPane bp2 = new BorderPane();
+				VBox vbox2 = new VBox();
+				TextField foodName = new TextField();
+				TextField calorieCount = new TextField();
+				TextField fatGrams = new TextField();
+				TextField carbGrams = new TextField();
+				TextField fiberGrams = new TextField();
+				TextField proteinGrams = new TextField();
+				Label title = new Label();
+				title.setText("Add food item with its nutrients");
+				foodName.setPromptText("food name");
+				calorieCount.setPromptText("calorie count");
+				fatGrams.setPromptText("fat grams");
+				carbGrams.setPromptText("carbohydrate grams");
+				fiberGrams.setPromptText("fiber grams");
+				proteinGrams.setPromptText("protein grams");
+				foodName.setFocusTraversable(false);
+				calorieCount.setFocusTraversable(false);
+				fatGrams.setFocusTraversable(false);
+				carbGrams.setFocusTraversable(false);
+				fiberGrams.setFocusTraversable(false);
+				proteinGrams.setFocusTraversable(false);
+				Button submit = new Button("submit");
+				submit.setOnAction(r -> addFoodWindow.close());
+				vbox2.getChildren().addAll(title,foodName,calorieCount,fatGrams,
+						carbGrams,fiberGrams,proteinGrams,submit);
+				bp2.setCenter(vbox2);
+				Scene popupScene = new Scene(bp2, 750, 450);
+				addFoodWindow.setTitle("Add Food Item");
+				addFoodWindow.setScene(popupScene);
+				addFoodWindow.show();
+				
 			});
 			deleteButton.setOnAction((ActionEvent e) -> {
 				ObservableList<String> delete = foodListView.getSelectionModel().getSelectedItems();
@@ -131,7 +166,9 @@ public class Main extends Application {
 				Iterator iter = foodListView.getItems().iterator();
 				while(iter.hasNext()) {
 					String next = (String) iter.next();
-					food.add(next);
+					if(food.contains(next) == false) {
+						food.add(next);
+					}
 					if(!next.contains(nameFilter.getText())) {
 						iter.remove();
 					}
