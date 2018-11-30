@@ -73,14 +73,26 @@ public class Main extends Application {
 			mealListView.setPrefWidth(350);
 			
 			Button delMealItemButton = new Button("Delete");
+			Button calculateSummaryButton = new Button("Calculate Summary");
 			
 			Label mealSummaryLabel = new Label("Meal Summary");
 			mealSummaryLabel.setStyle("-fx-font: 24 segoeui");
+			Label totalCaloriesLabel = new Label("Total Calories: ");
+			Label totalFatLabel = new Label("Total Fat: ");
+			Label totalCarbsLabel = new Label("Total Carbs: ");
+			Label totalFiberLabel = new Label("Total Fiber: ");
+			Label totalProteinLabel = new Label("Total Protein: ");
 			
 			vBoxLeft.getChildren().add(mealListLabel);
 			vBoxLeft.getChildren().add(mealListView);
 			vBoxLeft.getChildren().add(delMealItemButton);
 			vBoxLeft.getChildren().add(mealSummaryLabel);
+			vBoxLeft.getChildren().add(totalCaloriesLabel);
+			vBoxLeft.getChildren().add(totalFatLabel);
+			vBoxLeft.getChildren().add(totalCarbsLabel);
+			vBoxLeft.getChildren().add(totalFiberLabel);
+			vBoxLeft.getChildren().add(totalProteinLabel);
+			vBoxLeft.getChildren().add(calculateSummaryButton);
 			
 			// Drop down menu - MenuBar
 			FileChooser fileChooser = new FileChooser();
