@@ -86,6 +86,9 @@ public class Main extends Application {
 			
 			Label calorieSummaryLabel = new Label("0.0");
 			Label fatSummaryLabel = new Label("0.0 g");
+			Label carbSummaryLabel = new Label("0.0 g");
+			Label fiberSummaryLabel = new Label("0.0 g");
+			Label proteinSummaryLabel = new Label("0.0 g");
 			
 			HBox calorieHBox = new HBox();
 			HBox fatHBox = new HBox();
@@ -98,8 +101,11 @@ public class Main extends Application {
 			fatHBox.getChildren().add(totalFatLabel);
 			fatHBox.getChildren().add(fatSummaryLabel);
 			carbHBox.getChildren().add(totalCarbLabel);
+			carbHBox.getChildren().add(carbSummaryLabel);
 			fiberHBox.getChildren().add(totalFiberLabel);
+			fiberHBox.getChildren().add(fiberSummaryLabel);
 			proteinHBox.getChildren().add(totalProteinLabel);
+			proteinHBox.getChildren().add(proteinSummaryLabel);
 			
 			vBoxLeft.getChildren().add(mealListLabel);
 			vBoxLeft.getChildren().add(mealListView);
