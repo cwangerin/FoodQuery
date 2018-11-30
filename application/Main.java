@@ -34,47 +34,68 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 public class Main extends Application {
-	ListView<String> listView;
+	ListView<String> foodListView;
+	ListView<String> mealListView;
 	ArrayList<String> food;
 	TextField foodInput,calorieInput, nameFilter;
 	TableView table;
 	MenuBar dropMenu;
+	VBox vBoxLeft;
 	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
-			primaryStage.setTitle("Hello World!");
+			primaryStage.setTitle("Food Query");
 			BorderPane root = new BorderPane();
-			VBox vbox = new VBox();
+			VBox vBoxRight = new VBox();
 			HBox hbox = new HBox();
 			HBox hbox2 = new HBox();
 			Scene scene = new Scene(root,1280,720);
 			food = new ArrayList();
-			listView = new ListView<>();
+			foodListView = new ListView<>();
 			//table = new TableView();
 			foodInput = new TextField();
 			//calorieInput = new TextField();
 			nameFilter = new TextField();
-			vbox.getChildren().add(getData());
+			vBoxRight.getChildren().add(getData());
 			
-			// Drop down menu
+			// Left Vertical Box - Meal List
+			vBoxLeft = new VBox();
+
+			Label mealListLabel = new Label("Meal List");
+			mealListLabel.setStyle("-fx-font: 24 segoeui;");
+			
+			mealListView = new ListView<>();
+			mealListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			mealListView.setPrefHeight(700);
+			mealListView.setPrefWidth(350);
+			
+			Button delMealItemButton = new Button("Delete");
+			
+			vBoxLeft.getChildren().add(mealListLabel);
+			vBoxLeft.getChildren().add(mealListView);
+			vBoxLeft.getChildren().add(delMealItemButton);
+			
+			// Drop down menu - MenuBar
 			FileChooser fileChooser = new FileChooser();
-//			fileChooser.setTitle();
-//			fileChooser.showOpenDialog(primaryStage);
-			
 			dropMenu = new MenuBar();
 			Menu menuFile = new Menu("File");
 			menuFile.setOnShowing(e -> {  }); // TODO: Add events
 			menuFile.setOnShown  (e -> {  });
 			menuFile.setOnHiding (e -> {  });
 			menuFile.setOnHidden (e -> {  });
-			MenuItem menuItemFile = new MenuItem("Load File");
-			menuItemFile.setOnAction(e -> {
+			MenuItem menuFoodList = new MenuItem("Load Food List");
+			menuFoodList.setOnAction(e -> {
 			    fileChooser.showOpenDialog(primaryStage);
 			});
-			menuFile.getItems().add(menuItemFile);
+			menuFile.getItems().add(menuFoodList);
+			MenuItem menuMealList = new MenuItem("Load Meal List");
+			menuMealList.setOnAction(e -> {
+			    fileChooser.showOpenDialog(primaryStage);
+			});
+			menuFile.getItems().add(menuMealList);
 			dropMenu.getMenus().add(menuFile);
-			VBox dropMenuPanel = new VBox(dropMenu);
+			HBox dropMenuPanel = new HBox(dropMenu);
 			
 			/**
 			TableColumn foodColumn = new TableColumn("Food");
@@ -84,7 +105,8 @@ public class Main extends Application {
 			table.setItems(getFood());
 			table.getColumns().addAll(foodColumn,calorieColumn);
 			**/
-			listView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			foodListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+			foodListView.setPrefHeight(700);
 			foodInput.setPromptText("food");
 			//calorieInput.setPromptText("calorie");
 			nameFilter.setPromptText("name filter");
@@ -96,17 +118,17 @@ public class Main extends Application {
 			hbox2.getChildren().addAll(nameFilter,nameFilterButton, nameUnfilterButton);
 			//hbox.getChildren().addAll(foodInput, calorieInput, addButton, deleteButton);
 			addButton.setOnAction((ActionEvent e) -> {
-				listView.getItems().add(foodInput.getText());
+				foodListView.getItems().add(foodInput.getText());
 				foodInput.clear();
 			});
 			deleteButton.setOnAction((ActionEvent e) -> {
-				ObservableList<String> delete = listView.getSelectionModel().getSelectedItems();
-				listView.getItems().removeAll(delete);
-				//listView.getItems().remove(foodInput.getText());
+				ObservableList<String> delete = foodListView.getSelectionModel().getSelectedItems();
+				foodListView.getItems().removeAll(delete);
+				//foodListView.getItems().remove(foodInput.getText());
 				//foodInput.clear();
 			});
 			nameFilterButton.setOnAction((ActionEvent e) -> {
-				Iterator iter = listView.getItems().iterator();
+				Iterator iter = foodListView.getItems().iterator();
 				while(iter.hasNext()) {
 					String next = (String) iter.next();
 					food.add(next);
@@ -116,19 +138,20 @@ public class Main extends Application {
 				}
 			});
 			nameUnfilterButton.setOnAction((ActionEvent e) -> {
-				listView.getItems().clear();;
-				listView.getItems().addAll(food);
+				foodListView.getItems().clear();;
+				foodListView.getItems().addAll(food);
 				food.clear();
-				//listView.setItems(food);
+				//foodListView.setItems(food);
 			});
-		    //vbox.getChildren().add(listView);
-			vbox.getChildren().add(listView);
-		    vbox.getChildren().add(hbox);
-		    vbox.getChildren().add(hbox2);
-		    vbox.setStyle("-fx-background-color: red");
+		    //vBoxRight.getChildren().add(foodListView);
+			vBoxRight.getChildren().add(foodListView);
+		    vBoxRight.getChildren().add(hbox);
+		    vBoxRight.getChildren().add(hbox2);
+		    vBoxRight.setStyle("-fx-background-color: red");
 		    
 		    root.setTop(dropMenuPanel);
-		    root.setRight(vbox);
+		    root.setRight(vBoxRight);
+		    root.setLeft(vBoxLeft);
 		    
 		    // Setting scene to stage and displaying stage.
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
@@ -138,6 +161,7 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 	}
+	
 	public HBox getData() {
 		HBox hbox = new HBox();
 		Button btn = new Button("Upload Data");
@@ -151,7 +175,7 @@ public class Main extends Application {
 				Scanner sc = new Scanner(file);
 				while(sc.hasNextLine()) {
 					String line = sc.nextLine();
-					listView.getItems().add(line);;
+					foodListView.getItems().add(line);;
 					System.out.println(line);
 				}
 			} catch (FileNotFoundException e1) {
