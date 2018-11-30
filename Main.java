@@ -73,10 +73,50 @@ public class Main extends Application {
 			mealListView.setPrefWidth(350);
 			
 			Button delMealItemButton = new Button("Delete");
+			Button calculateSummaryButton = new Button("Calculate Summary");
+			
+			Label mealSummaryLabel = new Label("Meal Summary");
+			mealSummaryLabel.setStyle("-fx-font: 24 segoeui");
+			
+			Label totalCalorieLabel = new Label("Total Calories: ");
+			Label totalFatLabel = new Label("Total Fat: ");
+			Label totalCarbLabel = new Label("Total Carbs: ");
+			Label totalFiberLabel = new Label("Total Fiber: ");
+			Label totalProteinLabel = new Label("Total Protein: ");
+			
+			Label calorieSummaryLabel = new Label("0.0");
+			Label fatSummaryLabel = new Label("0.0 g");
+			Label carbSummaryLabel = new Label("0.0 g");
+			Label fiberSummaryLabel = new Label("0.0 g");
+			Label proteinSummaryLabel = new Label("0.0 g");
+			
+			HBox calorieHBox = new HBox();
+			HBox fatHBox = new HBox();
+			HBox carbHBox = new HBox();
+			HBox fiberHBox = new HBox();
+			HBox proteinHBox = new HBox();
+			
+			calorieHBox.getChildren().add(totalCalorieLabel);
+			calorieHBox.getChildren().add(calorieSummaryLabel);
+			fatHBox.getChildren().add(totalFatLabel);
+			fatHBox.getChildren().add(fatSummaryLabel);
+			carbHBox.getChildren().add(totalCarbLabel);
+			carbHBox.getChildren().add(carbSummaryLabel);
+			fiberHBox.getChildren().add(totalFiberLabel);
+			fiberHBox.getChildren().add(fiberSummaryLabel);
+			proteinHBox.getChildren().add(totalProteinLabel);
+			proteinHBox.getChildren().add(proteinSummaryLabel);
 			
 			vBoxLeft.getChildren().add(mealListLabel);
 			vBoxLeft.getChildren().add(mealListView);
 			vBoxLeft.getChildren().add(delMealItemButton);
+			vBoxLeft.getChildren().add(mealSummaryLabel);
+			vBoxLeft.getChildren().add(calorieHBox);
+			vBoxLeft.getChildren().add(fatHBox);
+			vBoxLeft.getChildren().add(carbHBox);
+			vBoxLeft.getChildren().add(fiberHBox);
+			vBoxLeft.getChildren().add(proteinHBox);
+			vBoxLeft.getChildren().add(calculateSummaryButton);
 			
 			// Drop down menu - MenuBar
 			FileChooser fileChooser = new FileChooser();
