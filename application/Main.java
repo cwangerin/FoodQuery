@@ -10,13 +10,13 @@ import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
@@ -57,6 +57,7 @@ public class Main extends Application {
 			foodInput = new TextField();
 			//calorieInput = new TextField();
 			nameFilter = new TextField();
+			
 			vBoxRight.getChildren().add(getData());
 			
 			// Left Vertical Box - Meal List
@@ -96,6 +97,12 @@ public class Main extends Application {
 			menuFile.getItems().add(menuMealList);
 			dropMenu.getMenus().add(menuFile);
 			HBox dropMenuPanel = new HBox(dropMenu);
+
+			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+			vBoxLeft.getChildren().add(getData());
+			
+			
+			
 			
 			/**
 			TableColumn foodColumn = new TableColumn("Food");
@@ -120,6 +127,43 @@ public class Main extends Application {
 			addButton.setOnAction((ActionEvent e) -> {
 				foodListView.getItems().add(foodInput.getText());
 				foodInput.clear();
+				//if(!(foodInput.getText().equals(""))) {
+				//	listView.getItems().add(foodInput.getText());
+				//}
+				//foodInput.clear();
+				Stage addFoodWindow = new Stage();
+				BorderPane bp2 = new BorderPane();
+				VBox vbox2 = new VBox();
+				TextField foodName = new TextField();
+				TextField calorieCount = new TextField();
+				TextField fatGrams = new TextField();
+				TextField carbGrams = new TextField();
+				TextField fiberGrams = new TextField();
+				TextField proteinGrams = new TextField();
+				Label title = new Label();
+				title.setText("Add food item with its nutrients");
+				foodName.setPromptText("food name");
+				calorieCount.setPromptText("calorie count");
+				fatGrams.setPromptText("fat grams");
+				carbGrams.setPromptText("carbohydrate grams");
+				fiberGrams.setPromptText("fiber grams");
+				proteinGrams.setPromptText("protein grams");
+				foodName.setFocusTraversable(false);
+				calorieCount.setFocusTraversable(false);
+				fatGrams.setFocusTraversable(false);
+				carbGrams.setFocusTraversable(false);
+				fiberGrams.setFocusTraversable(false);
+				proteinGrams.setFocusTraversable(false);
+				Button submit = new Button("submit");
+				submit.setOnAction(r -> addFoodWindow.close());
+				vbox2.getChildren().addAll(title,foodName,calorieCount,fatGrams,
+						carbGrams,fiberGrams,proteinGrams,submit);
+				bp2.setCenter(vbox2);
+				Scene popupScene = new Scene(bp2, 750, 450);
+				addFoodWindow.setTitle("Add Food Item");
+				addFoodWindow.setScene(popupScene);
+				addFoodWindow.show();
+				
 			});
 			deleteButton.setOnAction((ActionEvent e) -> {
 				ObservableList<String> delete = foodListView.getSelectionModel().getSelectedItems();
@@ -155,6 +199,12 @@ public class Main extends Application {
 		    
 		    // Setting scene to stage and displaying stage.
 			scene.getStylesheets().add(getClass().getResource("application.css").toExternalForm());
+		    //vbox.getChildren().add(listView);
+			vBoxRight.getChildren().add(foodListView);
+			vBoxRight.getChildren().add(hbox);
+			vBoxRight.getChildren().add(hbox2);
+		    root.setRight(vBoxRight);
+		    vBoxRight.setStyle("-fx-background-color: red");
 		    primaryStage.setScene(scene);
 			primaryStage.show();
 		} catch(Exception e) {
@@ -166,8 +216,8 @@ public class Main extends Application {
 		HBox hbox = new HBox();
 		Button btn = new Button("Upload Data");
 		TextField text = new TextField();
-		text.setPromptText("Food input file");
-		
+		text.setPromptText("file");
+		text.setFocusTraversable(false);
 		btn.setOnAction((ActionEvent e) -> {
 			String filename = text.getText();
 			File file = new File(filename);
@@ -182,7 +232,7 @@ public class Main extends Application {
 				e1.printStackTrace();
 			}
 		});
-		hbox.getChildren().add(new Label("Food List:"));
+		hbox.getChildren().add(new Label("import:"));
 		hbox.getChildren().add(text);
 	    hbox.getChildren().add(btn);
 	    hbox.setSpacing(10);
