@@ -138,6 +138,26 @@ public class Main extends Application {
 			menuMealList.setOnAction(e -> {
 			    fileChooser.showOpenDialog(primaryStage);
 			});
+			
+			menuHelpItem.setOnAction(e -> {
+				Stage instructionStage = new Stage();
+				BorderPane instructionPane = new BorderPane();
+				Label instructionLabel = new Label();
+				String instructions = "Load food items from a file by selecting that file from the browsing menu."
+						+ " Add food items by clicking on the Add New Food button. You can filter the food items by entering "
+						+ "a letter/phrase to search for. You can also filter food items by nutritional content. Enter a rule"
+						+ " by entering three things separated by spaces: <nutrient name> <comparator> <value>. The comparators are ="
+						+ ",<=, and >=. You can add as many rules as you want by entering each one, then pressing apply."
+						+ " To clear the filters, press the corresponding clear button. To add food items to the meal list, select them and hit send to meal.";
+				instructionLabel.setWrapText(true);
+				instructionLabel.setText(instructions);
+				instructionPane.setTop(instructionLabel);
+				Scene instructionScene = new Scene(instructionPane, 250, 250);
+				instructionStage.setTitle("Instructions");
+				instructionStage.setScene(instructionScene);
+				instructionStage.show();
+			});
+			
 			//menuFile.getItems().add(menuMealList);
 			dropMenu.getMenus().addAll(menuFile, menuHelp);
 			HBox dropMenuPanel = new HBox(dropMenu);
@@ -146,14 +166,18 @@ public class Main extends Application {
 			foodInput.setPromptText("food");
 			//calorieInput.setPromptText("calorie");
 			nameFilter.setPromptText("Enter name search");
-			Button addFood = new Button("Add Food (Popup)");
+			VBox addNewFoodSendToMeal = new VBox();
+			Button addFood = new Button("Add New Food");
+			Button sendToMeal = new Button("Send to Meal");
 			Button deleteButton = new Button("Delete");
 			Button nameFilterButton = new Button("Apply Name Filter");
 			Button removeNameFilter = new Button("Remove Name Filter");
 			Button nameUnfilterButton = new Button("Unfilter");
 			
+			addNewFoodSendToMeal.getChildren().addAll(addFood, sendToMeal);
+			
 			HBox listViewAddFoodHBox = new HBox();
-			listViewAddFoodHBox.getChildren().addAll(foodListView, addFood);
+			listViewAddFoodHBox.getChildren().addAll(foodListView, addNewFoodSendToMeal);
 			hbox2.getChildren().addAll(nameFilter,nameFilterButton, removeNameFilter);
 			//hbox.getChildren().addAll(foodInput, calorieInput, addFood, deleteButton);
 			addFood.setOnAction((ActionEvent e) -> {
@@ -231,6 +255,8 @@ public class Main extends Application {
 		    vBoxLeft.getChildren().add(hbox2);
 		    vBoxLeft.getChildren().add(nutrientQuery);
 		    
+		    //POPUP FOR INSTRUCTIONS
+		    
 
 			//spacing and padding start
 			listViewAddFoodHBox.setPadding(new Insets(0,5,0,10));
@@ -240,6 +266,9 @@ public class Main extends Application {
 			
 			hbox2.setPadding(new Insets(10,10,5,10));
 			hbox2.setSpacing(10);
+			
+			addNewFoodSendToMeal.setPadding(new Insets(0,5,5,10));
+			addNewFoodSendToMeal.setSpacing(10);
 			
 			//vBoxLeft.setPadding(new Insets(5,5,5,5));
 			//vBoxRight.setPadding(new Insets(5,5,5,5));
