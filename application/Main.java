@@ -41,17 +41,17 @@ public class Main extends Application {
 	TextField foodInput,calorieInput, nameFilter;
 	TableView table;
 	MenuBar dropMenu;
-	VBox vBoxLeft;
+	VBox vBoxRight;
 	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
 			primaryStage.setTitle("Food Query");
 			BorderPane root = new BorderPane();
-			VBox vBoxRight = new VBox();
+			VBox vBoxLeft = new VBox();
 			HBox hbox = new HBox();
 			HBox hbox2 = new HBox();
-			Scene scene = new Scene(root,1280,720);
+			Scene scene = new Scene(root,1000,720);
 			
 			food = new ArrayList();
 			foodListView = new ListView<>();
@@ -59,10 +59,10 @@ public class Main extends Application {
 			foodInput = new TextField();
 			//calorieInput = new TextField();
 			nameFilter = new TextField();
-			vBoxRight.getChildren().add(getData());
+			//vBoxLeft.getChildren().add(getData());
 			
 			// Left Vertical Box - Meal List
-			vBoxLeft = new VBox();
+			vBoxRight = new VBox();
 
 			Label mealListLabel = new Label("Meal List");
 			mealListLabel.setStyle("-fx-font: 24 segoeui;");
@@ -72,7 +72,7 @@ public class Main extends Application {
 			mealListView.setPrefHeight(700);
 			mealListView.setPrefWidth(350);
 			
-			Button delMealItemButton = new Button("Delete");
+			Button delMealItemButton = new Button("Delete Food");
 			Button calculateSummaryButton = new Button("Calculate Summary");
 			
 			Label mealSummaryLabel = new Label("Meal Summary");
@@ -84,11 +84,11 @@ public class Main extends Application {
 			Label totalFiberLabel = new Label("Total Fiber: ");
 			Label totalProteinLabel = new Label("Total Protein: ");
 			
-			Label calorieSummaryLabel = new Label("0.0");
-			Label fatSummaryLabel = new Label("0.0 g");
-			Label carbSummaryLabel = new Label("0.0 g");
-			Label fiberSummaryLabel = new Label("0.0 g");
-			Label proteinSummaryLabel = new Label("0.0 g");
+			Label calorieSummaryLabel = new Label("500.0");
+			Label fatSummaryLabel = new Label("15.0 g");
+			Label carbSummaryLabel = new Label("10.0 g");
+			Label fiberSummaryLabel = new Label("4.0 g");
+			Label proteinSummaryLabel = new Label("2.0 g");
 			
 			HBox calorieHBox = new HBox();
 			HBox fatHBox = new HBox();
@@ -107,60 +107,56 @@ public class Main extends Application {
 			proteinHBox.getChildren().add(totalProteinLabel);
 			proteinHBox.getChildren().add(proteinSummaryLabel);
 			
-			vBoxLeft.getChildren().add(mealListLabel);
-			vBoxLeft.getChildren().add(mealListView);
-			vBoxLeft.getChildren().add(delMealItemButton);
-			vBoxLeft.getChildren().add(mealSummaryLabel);
-			vBoxLeft.getChildren().add(calorieHBox);
-			vBoxLeft.getChildren().add(fatHBox);
-			vBoxLeft.getChildren().add(carbHBox);
-			vBoxLeft.getChildren().add(fiberHBox);
-			vBoxLeft.getChildren().add(proteinHBox);
-			vBoxLeft.getChildren().add(calculateSummaryButton);
+			vBoxRight.getChildren().add(mealListLabel);
+			vBoxRight.getChildren().add(mealListView);
+			vBoxRight.getChildren().add(delMealItemButton);
+			vBoxRight.getChildren().add(mealSummaryLabel);
+			vBoxRight.getChildren().add(calorieHBox);
+			vBoxRight.getChildren().add(fatHBox);
+			vBoxRight.getChildren().add(carbHBox);
+			vBoxRight.getChildren().add(fiberHBox);
+			vBoxRight.getChildren().add(proteinHBox);
+			vBoxRight.getChildren().add(calculateSummaryButton);
 			
 			// Drop down menu - MenuBar
 			FileChooser fileChooser = new FileChooser();
 			dropMenu = new MenuBar();
-			Menu menuFile = new Menu("File");
+			Menu menuFile = new Menu("Load Food Data");
+			Menu menuHelp = new Menu("Help");
 			menuFile.setOnShowing(e -> {  }); // TODO: Add events
 			menuFile.setOnShown  (e -> {  });
 			menuFile.setOnHiding (e -> {  });
 			menuFile.setOnHidden (e -> {  });
-			MenuItem menuFoodList = new MenuItem("Load Food List");
+			MenuItem menuFoodList = new MenuItem("Open File...");
+			MenuItem menuHelpItem = new MenuItem("Show Instructions");
 			menuFoodList.setOnAction(e -> {
 			    fileChooser.showOpenDialog(primaryStage);
 			});
 			menuFile.getItems().add(menuFoodList);
+			menuHelp.getItems().add(menuHelpItem);
 			MenuItem menuMealList = new MenuItem("Load Meal List");
 			menuMealList.setOnAction(e -> {
 			    fileChooser.showOpenDialog(primaryStage);
 			});
-			menuFile.getItems().add(menuMealList);
-			dropMenu.getMenus().add(menuFile);
+			//menuFile.getItems().add(menuMealList);
+			dropMenu.getMenus().addAll(menuFile, menuHelp);
 			HBox dropMenuPanel = new HBox(dropMenu);
-			
-			
-			/**
-			TableColumn foodColumn = new TableColumn("Food");
-			foodColumn.setCellFactory(new PropertyValueFactory<>("food"));
-			TableColumn calorieColumn = new TableColumn("Calories");
-			calorieColumn.setCellFactory(new PropertyValueFactory<>("calorie"));
-			table.setItems(getFood());
-			table.getColumns().addAll(foodColumn,calorieColumn);
-			**/
 			foodListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			foodListView.setPrefHeight(700);
 			foodInput.setPromptText("food");
 			//calorieInput.setPromptText("calorie");
-			nameFilter.setPromptText("name filter");
-			Button addButton = new Button("Add");
+			nameFilter.setPromptText("Enter name search");
+			Button addFood = new Button("Add Food (Popup)");
 			Button deleteButton = new Button("Delete");
-			Button nameFilterButton = new Button("Filter");
+			Button nameFilterButton = new Button("Apply Name Filter");
+			Button removeNameFilter = new Button("Remove Name Filter");
 			Button nameUnfilterButton = new Button("Unfilter");
-			hbox.getChildren().addAll(foodInput, addButton, deleteButton);
-			hbox2.getChildren().addAll(nameFilter,nameFilterButton, nameUnfilterButton);
-			//hbox.getChildren().addAll(foodInput, calorieInput, addButton, deleteButton);
-			addButton.setOnAction((ActionEvent e) -> {
+			
+			HBox listViewAddFoodHBox = new HBox();
+			listViewAddFoodHBox.getChildren().addAll(foodListView, addFood);
+			hbox2.getChildren().addAll(nameFilter,nameFilterButton, removeNameFilter);
+			//hbox.getChildren().addAll(foodInput, calorieInput, addFood, deleteButton);
+			addFood.setOnAction((ActionEvent e) -> {
 				//if(!(foodInput.getText().equals(""))) {
 				//	listView.getItems().add(foodInput.getText());
 				//}
@@ -217,48 +213,65 @@ public class Main extends Application {
 					}
 				}
 			});
-			nameUnfilterButton.setOnAction((ActionEvent e) -> {
-				foodListView.getItems().clear();;
-				foodListView.getItems().addAll(food);
-				food.clear();
-				//foodListView.setItems(food);
-			});
-		    //vBoxRight.getChildren().add(foodListView);
-			vBoxRight.getChildren().add(foodListView);
-		    vBoxRight.getChildren().add(hbox);
-		    vBoxRight.getChildren().add(hbox2);
+			
+			HBox nutrientQuery = new HBox();
+			TextField nutrientQueryText = new TextField();
+			nutrientQueryText.setPromptText("<nutrient> <comparator> <value>");
+			nutrientQueryText.setPrefWidth(200);
+			Button submitNutrientQuery = new Button("Apply Nutrient Query");
+			Button clearNutrientQuery = new Button("Clear Nutrient Queries");
+			nutrientQuery.getChildren().addAll(nutrientQueryText, submitNutrientQuery, clearNutrientQuery);
+			
+			
+			Label foodListLabel = new Label("Food List");
+			foodListLabel.setStyle("-fx-font: 24 segoeui;");
+		    //vBoxLeft.getChildren().add(foodListView);
+			vBoxLeft.getChildren().add(foodListLabel);
+			vBoxLeft.getChildren().add(listViewAddFoodHBox);
+		    vBoxLeft.getChildren().add(hbox2);
+		    vBoxLeft.getChildren().add(nutrientQuery);
 		    
 
 			//spacing and padding start
-			hbox.setPadding(new Insets(10,5,5,10));
-			hbox.setSpacing(10);
+			listViewAddFoodHBox.setPadding(new Insets(0,5,0,10));
+			listViewAddFoodHBox.setSpacing(10);
+			
+			foodListLabel.setPadding(new Insets(10,0,0,10));
 			
 			hbox2.setPadding(new Insets(10,10,5,10));
 			hbox2.setSpacing(10);
 			
+			//vBoxLeft.setPadding(new Insets(5,5,5,5));
+			//vBoxRight.setPadding(new Insets(5,5,5,5));
+			
+			
+			//listViewAddFoodHBox.setPadding(new Insets(10,5,5,10));
+			//listViewAddFoodHBox.setSpacing(10);
+			
+			nutrientQuery.setPadding(new Insets(10,5,5,10));
+			nutrientQuery.setSpacing(10);;
+			
+			
 			vBoxRight.setPadding(new Insets(5,5,5,5));
-			
-			
-			hbox.setPadding(new Insets(10,5,5,10));
-			hbox.setSpacing(10);
-			
-			
-			
-			vBoxLeft.setPadding(new Insets(5,5,5,5));
+			vBoxRight.setSpacing(5);
 			//spacing and padding end
 
 			//command sets color of list view
 			foodListView.setStyle("-fx-control-inner-background: #DCF3FF");	
 			 //sets style for background for the entire box
-		    vBoxRight.setStyle("-fx-background-color: #7aadff");
-		    dropMenuPanel.setStyle("-fx-background-color: #7aadff");
 		    vBoxLeft.setStyle("-fx-background-color: #7aadff");
+		    dropMenuPanel.setStyle("-fx-background-color: #7aadff");
+		    vBoxRight.setStyle("-fx-background-color: #7aadff");
+		    mealListView.setStyle("-fx-control-inner-background: #DCF3FF");
 		    
 		    
 		    root.setTop(dropMenuPanel);
-		    root.setRight(vBoxRight);
 		    root.setLeft(vBoxLeft);
+		    root.setRight(vBoxRight);
 		    
+		    //Hard coding lists for demonstration puroses
+		    foodListView.getItems().addAll("Apple", "Banana", "Cake", "Muffin");
+		    mealListView.getItems().addAll("Apple", "Muffin");
 		    
 		    //
 		    HBox centerBox = new HBox();
@@ -290,6 +303,7 @@ public class Main extends Application {
 					foodListView.getItems().add(line);;
 					System.out.println(line);
 				}
+				sc.close();
 			} catch (FileNotFoundException e1) {
 				e1.printStackTrace();
 			}
