@@ -55,11 +55,8 @@ public class Main extends Application {
 			
 			food = new ArrayList();
 			foodListView = new ListView<>();
-			//table = new TableView();
 			foodInput = new TextField();
-			//calorieInput = new TextField();
 			nameFilter = new TextField();
-			//vBoxLeft.getChildren().add(getData());
 			
 			// Left Vertical Box - Meal List
 			vBoxRight = new VBox();
@@ -74,7 +71,7 @@ public class Main extends Application {
 			
 			Button delMealItemButton = new Button("Delete Food");
 			Button calculateSummaryButton = new Button("Calculate Summary");
-			
+			delMealItemButton.setDisable(true);
 			Label mealSummaryLabel = new Label("Meal Summary");
 			mealSummaryLabel.setStyle("-fx-font: 24 segoeui");
 			
@@ -138,29 +135,43 @@ public class Main extends Application {
 			menuMealList.setOnAction(e -> {
 			    fileChooser.showOpenDialog(primaryStage);
 			});
-			//menuFile.getItems().add(menuMealList);
+			
+			menuHelpItem.setOnAction(e -> {
+				Stage instructionStage = new Stage();
+				BorderPane instructionPane = new BorderPane();
+				Label instructionLabel = new Label();
+				String instructions = "Load food items from a file by selecting that file from the browsing menu."
+						+ " Add food items by clicking on the Add New Food button. You can filter the food items by entering "
+						+ "a letter/phrase to search for. You can also filter food items by nutritional content. Enter a rule"
+						+ " by entering three things separated by spaces: <nutrient name> <comparator> <value>. The comparators are ="
+						+ ",<=, and >=. You can add as many rules as you want by entering each one, then pressing apply."
+						+ " To clear the filters, press the corresponding clear button. To add food items to the meal list, select them and hit send to meal.";
+				instructionLabel.setWrapText(true);
+				instructionLabel.setText(instructions);
+				instructionPane.setTop(instructionLabel);
+				Scene instructionScene = new Scene(instructionPane, 350, 350);
+				instructionStage.setTitle("Instructions");
+				instructionStage.setScene(instructionScene);
+				instructionStage.show();
+			});
 			dropMenu.getMenus().addAll(menuFile, menuHelp);
 			HBox dropMenuPanel = new HBox(dropMenu);
 			foodListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			foodListView.setPrefHeight(700);
 			foodInput.setPromptText("food");
-			//calorieInput.setPromptText("calorie");
 			nameFilter.setPromptText("Enter name search");
-			Button addFood = new Button("Add Food (Popup)");
-			Button deleteButton = new Button("Delete");
+			VBox addNewFoodSendToMeal = new VBox();
+			Button addFood = new Button("Add New Food");
+			Button sendToMeal = new Button("Send to Meal");
 			Button nameFilterButton = new Button("Apply Name Filter");
 			Button removeNameFilter = new Button("Remove Name Filter");
-			Button nameUnfilterButton = new Button("Unfilter");
+			
+			addNewFoodSendToMeal.getChildren().addAll(addFood, sendToMeal);
 			
 			HBox listViewAddFoodHBox = new HBox();
-			listViewAddFoodHBox.getChildren().addAll(foodListView, addFood);
+			listViewAddFoodHBox.getChildren().addAll(foodListView, addNewFoodSendToMeal);
 			hbox2.getChildren().addAll(nameFilter,nameFilterButton, removeNameFilter);
-			//hbox.getChildren().addAll(foodInput, calorieInput, addFood, deleteButton);
 			addFood.setOnAction((ActionEvent e) -> {
-				//if(!(foodInput.getText().equals(""))) {
-				//	listView.getItems().add(foodInput.getText());
-				//}
-				//foodInput.clear();
 				Stage addFoodWindow = new Stage();
 				BorderPane bp2 = new BorderPane();
 				VBox vbox2 = new VBox();
@@ -195,11 +206,9 @@ public class Main extends Application {
 				addFoodWindow.show();
 			});
 			
-			deleteButton.setOnAction((ActionEvent e) -> {
-				ObservableList<String> delete = foodListView.getSelectionModel().getSelectedItems();
-				foodListView.getItems().removeAll(delete);
-				//foodListView.getItems().remove(foodInput.getText());
-				//foodInput.clear();
+			delMealItemButton.setOnAction((ActionEvent e) -> {
+				ObservableList<String> delete = mealListView.getSelectionModel().getSelectedItems();
+				mealListView.getItems().removeAll(delete);
 			});
 			nameFilterButton.setOnAction((ActionEvent e) -> {
 				Iterator iter = foodListView.getItems().iterator();
@@ -213,7 +222,11 @@ public class Main extends Application {
 					}
 				}
 			});
-			
+			removeNameFilter.setOnAction((ActionEvent e) -> {
+				foodListView.getItems().clear();;
+				foodListView.getItems().addAll(food);
+				food.clear();
+			});
 			HBox nutrientQuery = new HBox();
 			TextField nutrientQueryText = new TextField();
 			nutrientQueryText.setPromptText("<nutrient> <comparator> <value>");
@@ -231,6 +244,8 @@ public class Main extends Application {
 		    vBoxLeft.getChildren().add(hbox2);
 		    vBoxLeft.getChildren().add(nutrientQuery);
 		    
+		    //POPUP FOR INSTRUCTIONS
+		    
 
 			//spacing and padding start
 			listViewAddFoodHBox.setPadding(new Insets(0,5,0,10));
@@ -240,6 +255,9 @@ public class Main extends Application {
 			
 			hbox2.setPadding(new Insets(10,10,5,10));
 			hbox2.setSpacing(10);
+			
+			addNewFoodSendToMeal.setPadding(new Insets(0,5,5,10));
+			addNewFoodSendToMeal.setSpacing(10);
 			
 			//vBoxLeft.setPadding(new Insets(5,5,5,5));
 			//vBoxRight.setPadding(new Insets(5,5,5,5));
@@ -258,7 +276,7 @@ public class Main extends Application {
 
 			//command sets color of list view
 			foodListView.setStyle("-fx-control-inner-background: #DCF3FF");	
-			 //sets style for background for the entire box
+			//sets style for background for the entire box
 		    vBoxLeft.setStyle("-fx-background-color: #7aadff");
 		    dropMenuPanel.setStyle("-fx-background-color: #7aadff");
 		    vBoxRight.setStyle("-fx-background-color: #7aadff");
@@ -313,10 +331,6 @@ public class Main extends Application {
 	    hbox.getChildren().add(btn);
 	    hbox.setSpacing(10);
 	    return hbox;
-	}
-	public ObservableList getFood() {
-		ObservableList food = FXCollections.observableArrayList();
-		return food;
 	}
 	public static void main(String[] args) {
 		launch(args);
