@@ -1,3 +1,4 @@
+package application;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,6 +25,11 @@ public class FoodItem {
      */
     public FoodItem(String id, String name) {
         // TODO : Complete
+    	
+    	nutrients = new HashMap<String, Double>();
+    	
+    	this.id = id;
+    	this.name = name;
     }
     
     /**
@@ -42,7 +48,7 @@ public class FoodItem {
      */
     public String getID() {
         // TODO : Complete
-        return null;
+        return id;
     }
     
     /**
@@ -52,7 +58,7 @@ public class FoodItem {
      */
     public HashMap<String, Double> getNutrients() {
         // TODO : Complete
-        return null;
+        return nutrients;
     }
 
     /**
@@ -61,6 +67,8 @@ public class FoodItem {
      */
     public void addNutrient(String name, double value) {
         // TODO : Complete
+    	
+    	nutrients.put(name, value);
     }
 
     /**
@@ -69,6 +77,10 @@ public class FoodItem {
      */
     public double getNutrientValue(String name) {
         // TODO : Complete
+    	if(nutrients.containsKey(name)) {
+    		return nutrients.get(name);
+    	}
+    	
         return 0;
     }
     
