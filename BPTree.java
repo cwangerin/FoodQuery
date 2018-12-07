@@ -1,5 +1,6 @@
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -127,11 +128,15 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         // List of keys
         List<K> keys;
         
+        // True if the node is a leaf, false otherwise.
+        boolean leaf;
+        
         /**
          * Package constructor
          */
         Node() {
             keys = new ArrayList<K>();
+            leaf = false;
         }
         
         /**
@@ -198,6 +203,18 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         }
         
         /**
+         * Private helper method that returns the node where a key resides.
+         * 
+         * @param key The key to look up.
+         * @param node The root node.
+         * @return Node The node we are trying to find.
+         */
+        private Node search(K key, Node node) {
+        	
+        	return null;
+        }
+        
+        /**
          * (non-Javadoc)
          * @see BPTree.Node#getFirstLeafKey()
          */
@@ -218,7 +235,13 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#insert(java.lang.Comparable, java.lang.Object)
          */
         void insert(K key, V value) {
-            // TODO : Complete
+        	// Inserts into root if the root is empty.
+        	if (root.keys.size() == 0) {
+        		root.insert(key, value);
+        	}
+        	/*else { // FIXME: For if we want to use search method to find node to insert into.
+        		Node insertNode = search(key, root);
+        	}*/
         }
         
         /**
@@ -261,11 +284,14 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         // Reference to the previous leaf node
         LeafNode previous;
         
+        // 
+        
         /**
          * Package constructor
          */
         LeafNode() {
             super();
+            leaf = true;
             // TODO : Complete
         }
         
