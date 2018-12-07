@@ -259,29 +259,35 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         private Node insertHelper(K key, V value, Node node) {
         	// Variable declaration
         	int i = 0; // Loop index
-        	K key1; // K object will hold the traversed key.
+        	K key1; // K objects will hold the keys in current and next position.
         	K key2;
+        	int numKeys; // Holds number of keys in node.
         	
         	// If the node is a leaf, then we have found the node to insert into.
         	if (node.leaf) {
         		return node;
         	}
+        	
+        	numKeys = node.keys.size();
         	// Else, traverse down the correct path.
-        	for (i = 0; i < node.keys.size() - 1; i++) { // FIXME Add case where -1 not applicable?
+        	for (i = 0; i < numKeys - 1; i++) { // FIXME Add case where -1 not applicable?
         		key1 = node.keys.get(i);
         		key2 = node.keys.get(i + 1);
         		
-        		// Case: The key is less than the first key.
+        		// Case: The key is less or equal to the first key.
         		if (key.compareTo(key1) <=0) {
         			insertHelper(key, value, children.get(i));
         		}
-        		// Case: The key is greater than the first key, but less than the second.
+        		// Case: The key is greater than the first key, but less or equal to the second.
         		else if (key.compareTo(key1) > 0 && key.compareTo(key2) < 0) {
-        			insertHelper(key, value, children.get(key2));
+        			insertHelper(key, value, children.get(i + 1));
         		}
         		// Case: The key is greater than the last key.
-        		
+        		else {
+        			insertHelper(key, value, children.get(numKeys - 1));
+        		}
         	}
+        	// FIXME: What to return if none of the cases are met?
         	return null;
         }
         
