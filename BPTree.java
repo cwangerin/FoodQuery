@@ -248,7 +248,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         }
         
         /**
-         * Private helper method that assists insert
+         * Private helper method that assists insert by returning the node to insert into.
+         * Cases
          * 
          * @param key The key to insert
          * @param node
@@ -258,6 +259,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	if (node.leaf) {
         		return node;
         	}
+        	
         	
         	return null;
         }
