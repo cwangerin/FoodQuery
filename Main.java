@@ -56,11 +56,8 @@ public class Main extends Application {
 			
 			food = new ArrayList();
 			foodListView = new ListView<>();
-			//table = new TableView();
 			foodInput = new TextField();
-			//calorieInput = new TextField();
 			nameFilter = new TextField();
-			//vBoxLeft.getChildren().add(getData());
 			
 			// Left Vertical Box - Meal List
 			vBoxRight = new VBox();
@@ -190,10 +187,6 @@ public class Main extends Application {
 			hbox2.getChildren().addAll(nameFilter,nameFilterButton, removeNameFilter);
 			//hbox.getChildren().addAll(foodInput, calorieInput, addFood, deleteButton);
 			addFood.setOnAction((ActionEvent e) -> {
-				//if(!(foodInput.getText().equals(""))) {
-				//	listView.getItems().add(foodInput.getText());
-				//}
-				//foodInput.clear();
 				Stage addFoodWindow = new Stage();
 				BorderPane bp2 = new BorderPane();
 				VBox vbox2 = new VBox();
@@ -231,8 +224,6 @@ public class Main extends Application {
 			deleteButton.setOnAction((ActionEvent e) -> {
 				ObservableList<String> delete = foodListView.getSelectionModel().getSelectedItems();
 				foodListView.getItems().removeAll(delete);
-				//foodListView.getItems().remove(foodInput.getText());
-				//foodInput.clear();
 			});
 			nameFilterButton.setOnAction((ActionEvent e) -> {
 				Iterator iter = foodListView.getItems().iterator();
@@ -258,7 +249,6 @@ public class Main extends Application {
 			
 			Label foodListLabel = new Label("Food List");
 			foodListLabel.setStyle("-fx-font: 24 segoeui;");
-		    //vBoxLeft.getChildren().add(foodListView);
 			vBoxLeft.getChildren().add(foodListLabel);
 			vBoxLeft.getChildren().add(listViewAddFoodHBox);
 		    vBoxLeft.getChildren().add(hbox2);
