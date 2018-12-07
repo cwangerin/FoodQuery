@@ -164,6 +164,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         abstract List<V> rangeSearch(K key, String comparator);
 
         /**
+         * Returns true if the node has more keys than the branching factor.
          * 
          * @return boolean
          */
@@ -209,8 +210,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#isOverflow()
          */
         boolean isOverflow() {
-            // TODO : Complete
-            return false;
+            return keys.size() > branchingFactor;
         }
         
         /**
