@@ -8,63 +8,46 @@ import java.util.List;
 import java.util.Scanner;
 
 import javafx.application.Application;
-import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.SelectionMode;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
 import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.geometry.Insets;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.PropertyValueFactory;
 
 public class Main extends Application {
-	ListView<String> foodListView;
-	ListView<String> mealListView;
+	ListView<String> foodListView, mealListView;
 	ArrayList<String> food;
-	TextField foodInput,calorieInput, nameFilter;
-	TableView table;
 	MenuBar dropMenu;
-	VBox vBoxRight;
+	VBox vBoxRight, vBoxLeft;
 	
 	@Override
 	public void start(Stage primaryStage) {
 		try {
 			primaryStage.setTitle("Food Query");
 			BorderPane root = new BorderPane();
-			VBox vBoxLeft = new VBox();
+			vBoxLeft = new VBox();
+			vBoxRight = new VBox();
 			HBox hbox = new HBox();
 			HBox hbox2 = new HBox();
 			Scene scene = new Scene(root,1000,720);
 			
 			food = new ArrayList();
 			foodListView = new ListView<>();
-			//table = new TableView();
-			foodInput = new TextField();
-			//calorieInput = new TextField();
-			nameFilter = new TextField();
-			//vBoxLeft.getChildren().add(getData());
 			
-			// Left Vertical Box - Meal List
-			vBoxRight = new VBox();
-
+			// Right Vertical Box - Meal List
+			
 			Label mealListLabel = new Label("Meal List");
 			mealListLabel.setStyle("-fx-font: 24 segoeui;");
 			
@@ -108,16 +91,9 @@ public class Main extends Application {
 			proteinHBox.getChildren().add(totalProteinLabel);
 			proteinHBox.getChildren().add(proteinSummaryLabel);
 			
-			vBoxRight.getChildren().add(mealListLabel);
-			vBoxRight.getChildren().add(mealListView);
-			vBoxRight.getChildren().add(delMealItemButton);
-			vBoxRight.getChildren().add(mealSummaryLabel);
-			vBoxRight.getChildren().add(calorieHBox);
-			vBoxRight.getChildren().add(fatHBox);
-			vBoxRight.getChildren().add(carbHBox);
-			vBoxRight.getChildren().add(fiberHBox);
-			vBoxRight.getChildren().add(proteinHBox);
-			vBoxRight.getChildren().add(calculateSummaryButton);
+			vBoxRight.getChildren().addAll(mealListLabel,mealListView,delMealItemButton,
+					mealSummaryLabel,calorieHBox,fatHBox,carbHBox,fiberHBox,proteinHBox,
+					calculateSummaryButton);
 			
 			// Drop down menu - MenuBar
 			FileChooser fileChooser = new FileChooser();
@@ -167,13 +143,13 @@ public class Main extends Application {
 				instructionStage.show();
 			});
 			
-			//menuFile.getItems().add(menuMealList);
 			dropMenu.getMenus().addAll(menuFile, menuHelp);
 			HBox dropMenuPanel = new HBox(dropMenu);
 			foodListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			foodListView.setPrefHeight(700);
+			TextField foodInput = new TextField();
+			TextField nameFilter = new TextField();
 			foodInput.setPromptText("food");
-			//calorieInput.setPromptText("calorie");
 			nameFilter.setPromptText("Enter name search");
 			VBox addNewFoodSendToMeal = new VBox();
 			Button addFood = new Button("Add New Food");
@@ -181,19 +157,13 @@ public class Main extends Application {
 			Button deleteButton = new Button("Delete");
 			Button nameFilterButton = new Button("Apply Name Filter");
 			Button removeNameFilter = new Button("Remove Name Filter");
-			Button nameUnfilterButton = new Button("Unfilter");
 			
 			addNewFoodSendToMeal.getChildren().addAll(addFood, sendToMeal);
 			
 			HBox listViewAddFoodHBox = new HBox();
 			listViewAddFoodHBox.getChildren().addAll(foodListView, addNewFoodSendToMeal);
 			hbox2.getChildren().addAll(nameFilter,nameFilterButton, removeNameFilter);
-			//hbox.getChildren().addAll(foodInput, calorieInput, addFood, deleteButton);
 			addFood.setOnAction((ActionEvent e) -> {
-				//if(!(foodInput.getText().equals(""))) {
-				//	listView.getItems().add(foodInput.getText());
-				//}
-				//foodInput.clear();
 				Stage addFoodWindow = new Stage();
 				BorderPane bp2 = new BorderPane();
 				VBox vbox2 = new VBox();
@@ -231,8 +201,6 @@ public class Main extends Application {
 			deleteButton.setOnAction((ActionEvent e) -> {
 				ObservableList<String> delete = foodListView.getSelectionModel().getSelectedItems();
 				foodListView.getItems().removeAll(delete);
-				//foodListView.getItems().remove(foodInput.getText());
-				//foodInput.clear();
 			});
 			nameFilterButton.setOnAction((ActionEvent e) -> {
 				Iterator iter = foodListView.getItems().iterator();
@@ -258,7 +226,6 @@ public class Main extends Application {
 			
 			Label foodListLabel = new Label("Food List");
 			foodListLabel.setStyle("-fx-font: 24 segoeui;");
-		    //vBoxLeft.getChildren().add(foodListView);
 			vBoxLeft.getChildren().add(foodListLabel);
 			vBoxLeft.getChildren().add(listViewAddFoodHBox);
 		    vBoxLeft.getChildren().add(hbox2);
@@ -279,12 +246,7 @@ public class Main extends Application {
 			addNewFoodSendToMeal.setPadding(new Insets(0,5,5,10));
 			addNewFoodSendToMeal.setSpacing(10);
 			
-			//vBoxLeft.setPadding(new Insets(5,5,5,5));
-			//vBoxRight.setPadding(new Insets(5,5,5,5));
-			
-			
-			//listViewAddFoodHBox.setPadding(new Insets(10,5,5,10));
-			//listViewAddFoodHBox.setSpacing(10);
+			vBoxLeft.setPadding(new Insets(5,5,5,5));
 			
 			nutrientQuery.setPadding(new Insets(10,5,5,10));
 			nutrientQuery.setSpacing(10);;
@@ -296,7 +258,7 @@ public class Main extends Application {
 
 			//command sets color of list view
 			foodListView.setStyle("-fx-control-inner-background: #DCF3FF");	
-			 //sets style for background for the entire box
+			//sets style for background for the entire box
 		    vBoxLeft.setStyle("-fx-background-color: #7aadff");
 		    dropMenuPanel.setStyle("-fx-background-color: #7aadff");
 		    vBoxRight.setStyle("-fx-background-color: #7aadff");
@@ -351,10 +313,6 @@ public class Main extends Application {
 	    hbox.getChildren().add(btn);
 	    hbox.setSpacing(10);
 	    return hbox;
-	}
-	public ObservableList getFood() {
-		ObservableList food = FXCollections.observableArrayList();
-		return food;
 	}
 	public static void main(String[] args) {
 		launch(args);
