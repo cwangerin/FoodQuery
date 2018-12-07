@@ -235,18 +235,49 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#insert(java.lang.Comparable, java.lang.Object)
          */
         void insert(K key, V value) {
-        	// Inserts into root if the root is empty.
+        	// Variable declaration
+        	Node child; // To hold the leaf node to insert key into.
+        	Node sibling; // To hold the sibling node from splitting.
+        	K siblingKey; // To hold the sibling's first key.
+        	
+        	// Inserts into root if the root is empty. // FIXME: Necessary?
         	if (root.keys.size() == 0) {
         		root.insert(key, value);
+        		child = null; // FIXME: Set leaf to root?
         	}
-        	// FIXME + Case for root==leaf?
+        	// Otherwise, calls insertHelper to find the child to insert key into.
         	else {
-        		insertHelper(key, value, root);
+        		child = insertHelper(key, value, root);
+        		child.insert(key, value);
         	}
-        	/*else { // FIXME: For if we want to use search method to find node to insert into.
-        		Node insertNode = search(key, root);
-        	}*/
+        	
+        	// Checking if there is overflow in the child node, then splitting if so. 
+        	if (child.isOverflow()) {
+        		sibling = child.split();
+        		siblingKey = sibling.getFirstLeafKey();
+        		// FIXME: I have no idea how to get the parent to point to the sibling node.
+        	}
         }
+        
+        /**
+         * (non-Javadoc)
+         * @see BPTree.Node#split()
+         */
+        Node split() {
+            // TODO : Complete
+            return null;
+        }
+        
+        /**
+         * (non-Javadoc)
+         * @see BPTree.Node#rangeSearch(java.lang.Comparable, java.lang.String)
+         */
+        List<V> rangeSearch(K key, String comparator) {
+            // TODO : Complete
+            return null;
+        }
+        
+        /* Private helper methods */
         
         /**
          * Private helper method that assists insert by returning the node to insert into.
@@ -289,24 +320,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	}
         	// FIXME: What to return if none of the cases are met?
         	return null;
-        }
-        
-        /**
-         * (non-Javadoc)
-         * @see BPTree.Node#split()
-         */
-        Node split() {
-            // TODO : Complete
-            return null;
-        }
-        
-        /**
-         * (non-Javadoc)
-         * @see BPTree.Node#rangeSearch(java.lang.Comparable, java.lang.String)
-         */
-        List<V> rangeSearch(K key, String comparator) {
-            // TODO : Complete
-            return null;
         }
     
     } // End of class InternalNode
