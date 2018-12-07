@@ -100,6 +100,8 @@ public class FoodData implements FoodDataADT<FoodItem> {
     	}catch(Exception e) {
     		System.err.println(e.getMessage());
     	}
+    	
+    	Collections.sort(foodItemList, (a,b) -> a.getName().toLowerCase().compareTo(b.getName().toLowerCase()));
     }
     
     private void addFoodToHashMap(FoodItem newItem) {
@@ -229,5 +231,6 @@ public class FoodData implements FoodDataADT<FoodItem> {
     	
     	
     }
+    
 
 }
