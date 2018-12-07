@@ -208,11 +208,11 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @param key The key to look up.
          * @param node The root node.
          * @return Node The node we are trying to find.
-         */
+         *//*
         private Node search(K key, Node node) {
-        	
+        	FIXME: Necessary to complete?
         	return null;
-        }
+        }*/
         
         /**
          * (non-Javadoc)
@@ -239,9 +239,27 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	if (root.keys.size() == 0) {
         		root.insert(key, value);
         	}
+        	else {
+        		insertHelper(key, value, root);
+        	}
         	/*else { // FIXME: For if we want to use search method to find node to insert into.
         		Node insertNode = search(key, root);
         	}*/
+        }
+        
+        /**
+         * Private helper method that assists insert
+         * 
+         * @param key The key to insert
+         * @param node
+         * @return
+         */
+        private Node insertHelper(K key, V value, Node node) {
+        	if (node.leaf) {
+        		return node;
+        	}
+        	
+        	return null;
         }
         
         /**
