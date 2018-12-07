@@ -33,6 +33,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     /**
      * Public constructor
      * 
+     * Since a new node is a leaf node, the root of a new BPTree is a LeafNode.
+     * 
      * @param branchingFactor 
      */
     public BPTree(int branchingFactor) {
@@ -41,6 +43,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
                "Illegal branching factor: " + branchingFactor);
         }
         // TODO : Complete
+        this.branchingFactor = branchingFactor;
+        root = new LeafNode();
     }
     
     
@@ -48,11 +52,18 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
      * (non-Javadoc)
      * @see BPTreeADT#insert(java.lang.Object, java.lang.Object)
      */
+    /**
+     * Inserts a key and value pair into the BPTree.
+     * 
+     * Note: key-value pairs with duplicate keys can be inserted into the tree.
+     * 
+     * @param key The key to insert.
+     * @param value The value to insert.
+     */
     @Override
     public void insert(K key, V value) {
-        // TODO : Complete
+        root.insert(key, value);
     }
-    
     
     /*
      * (non-Javadoc)
@@ -120,7 +131,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * Package constructor
          */
         Node() {
-            // TODO : Complete
+            keys = new ArrayList<K>();
         }
         
         /**
@@ -182,7 +193,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         InternalNode() {
             super();
-            // TODO : Complete
+            children = new ArrayList<Node>();
         }
         
         /**
@@ -190,8 +201,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#getFirstLeafKey()
          */
         K getFirstLeafKey() {
-            // TODO : Complete
-            return null;
+            return children.get(0).getFirstLeafKey();
         }
         
         /**
