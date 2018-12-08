@@ -238,12 +238,14 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	// Variable declaration
         	Node child; // To hold the leaf node to insert key into.
         	Node sibling; // To hold the sibling node from splitting.
+        	InternalNode newINRoot; // To hold the new root if the root has overflow.
         	K siblingKey; // To hold the sibling's first key.
+        	int index; // Holds index to place a new key and its children into.
         	
         	// Inserts into root if the root is empty. // FIXME: Necessary?
         	if (root.keys.size() == 0) {
         		root.insert(key, value);
-        		child = null; // FIXME: Set leaf to root?
+        		child = null; // FIXME: Set child to root?
         	}
         	// Otherwise, calls insertHelper to find the child to insert key into.
         	else {
@@ -254,53 +256,32 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	// Checking if there is overflow in the child node, then splitting if so. 
         	if (child.isOverflow()) {
         		sibling = child.split();
+        		// Getting sibling's key and putting it into its parent node.
         		siblingKey = sibling.getFirstLeafKey();
-        		// FIXME: I have no idea how to get the parent to point to the sibling node.
-        		// Ideas: Just add it to the list of keys?
-        		
+        		// Making sure to insert the key into the correct index.
+        		index = positionFinder(siblingKey);
+        		keys.add(index, siblingKey);
+        		children.add(index, sibling); // FIXME: needs index + 1?
         	}
-        }
-        
-        /**
-         * Private helper method that returns the position in the list that a key should be
-         * added to
-         * 
-         * FIXME: Can we optimize this by checking the first and last keys first?
-         * 
-         * @param key The key to insert.
-         * @return The int position in the list.
-         */
-        private int positionFinder(K key) {
-        	// Variable declaration
-        	int i = 0; // Loop index.
-        	K key1; // K objects will hold the keys in current and next position.
-        	K key2;
-        	K lastKey; // K object will hold the key in the last index.
-        	int numKeys; // Holds number of keys in list.
         	
-        	numKeys = keys.size();
-        	lastKey = keys.get(numKeys - 1);
-        	// Loop through the keys list to find a position.
-        	for (i = 0; i < numKeys - 1; i++) { // FIXME: Require -1?
-        		key1 = keys.get(i);
-        		key2 = keys.get(i + 1);
+        	sibling = null;
+        	// Checking if the root has overflow, then splitting if so.
+        	if (root.isOverflow()) {
+        		// If the root has overflow, must create a new InternalNode to hold the children.
+        		newINRoot = new InternalNode();
         		
-        		// Case: Key is less or equal to current key.
-        		if (key.compareTo(key1) <= 0) {
-        			return i;
-        		}
-        		// Case: Key is greater than current but less than or equal to next key.
-        		else if (key.compareTo(key1) > 0 && key.compareTo(key2) <= 0) {
-        			return i + 1;
-        		}
-        		// Case: Key is greater than the last key.
-        		else if (key.compareTo(lastKey) > 0) {
-        			return numKeys + 1;
-        			
-        		}
+        		// Getting sibling's key.
+        		sibling = split();
+        		siblingKey = sibling.getFirstLeafKey();
+        		
+        		// Putting children into the newly created InternalNode, which is now the root.
+        		newINRoot.keys.add(siblingKey);
+//        		newINRoot.children.add(this); // FIXME: This used in place of children
+        		newINRoot.children.addAll(children);
+        		newINRoot.children.add(sibling);
+        		
+        		root = newINRoot;
         	}
-        	// FIXME: What to return if no cases?
-        	return -1;
         }
         
         /**
@@ -345,15 +326,15 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	}
         	
         	numKeys = node.keys.size();
-        	lastKey = node.keys.get(numKeys - 1); // Getting last index key.
+        	lastKey = node.keys.get(numKeys - 1); // Getting last key index.
         	
         	// Else, traverse down the correct path.
         	for (i = 0; i < numKeys - 1; i++) { // FIXME Add case where -1 not applicable?
         		key1 = node.keys.get(i);
         		key2 = node.keys.get(i + 1);
         		
-        		// Case: The key is less or equal to the first key.
-        		if (key.compareTo(key1) <=0) {
+        		// Case: The key is less than or equal to the first key.
+        		if (key.compareTo(key1) <= 0) {
         			insertHelper(key, value, children.get(i));
         		}
         		// Case: The key is greater than the first key, but less or equal to the second.
@@ -367,6 +348,48 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	}
         	// FIXME: What to return if none of the cases are met?
         	return null;
+        }
+        
+        /**
+         * Private helper method that returns the position in the list that a key should be
+         * added to
+         * 
+         * FIXME: Can we optimize this by checking the first and last keys first?
+         * 
+         * @param key The key to insert.
+         * @return The int position in the list.
+         */
+        private int positionFinder(K key) {
+        	// Variable declaration
+        	int i = 0; // Loop index.
+        	K key1; // K objects will hold the keys in current and next position.
+        	K key2;
+        	K lastKey; // K object will hold the key in the last index.
+        	int numKeys; // Holds number of keys in list.
+        	
+        	numKeys = keys.size();
+        	lastKey = keys.get(numKeys - 1);
+        	// Loop through the keys list to find a position.
+        	for (i = 0; i < numKeys - 1; i++) { // FIXME: Requires -1?
+        		key1 = keys.get(i);
+        		key2 = keys.get(i + 1);
+        		
+        		// Case: Key is less or equal to current key.
+        		if (key.compareTo(key1) <= 0) {
+        			return i;
+        		}
+        		// Case: Key is greater than current but less than or equal to next key.
+        		else if (key.compareTo(key1) > 0 && key.compareTo(key2) <= 0) {
+        			return i + 1;
+        		}
+        		// Case: Key is greater than the last key.
+        		else if (key.compareTo(lastKey) > 0) {
+        			return numKeys + 1;
+        			
+        		}
+        	}
+        	// FIXME: What to return if no cases match?
+        	return -1;
         }
     
     } // End of class InternalNode
