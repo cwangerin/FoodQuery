@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
@@ -40,7 +41,6 @@ import javafx.scene.control.cell.PropertyValueFactory;
 public class Main extends Application {
 	ObservableList<FoodItem> foodObservableList;
 	ListView<FoodItem> foodListView;
-	//List<String> foodList;
 	
 	List<FoodItem> filteredByNutrientList;
 	List<FoodItem> filteredByNameList;
@@ -67,11 +67,8 @@ public class Main extends Application {
 			Scene scene = new Scene(root,1000,720);
 			
 			foodListView = new ListView<>();
-			//table = new TableView();
 			foodInput = new TextField();
-			//calorieInput = new TextField();
 			nameFilter = new TextField();
-			//vBoxLeft.getChildren().add(getData());
 			
 			// Left Vertical Box - Meal List
 			vBoxRight = new VBox();
@@ -193,7 +190,6 @@ public class Main extends Application {
 				filteredByNameList = foodData.getAllFoodItems();
 				foodListView.setItems(foodObservableList.sorted());
 				foodCountLabel.textProperty().bind((Bindings.size(foodObservableList).asString()));
-				
 			});
 			
 			menuHelpItem.setOnAction(e -> {
@@ -215,26 +211,24 @@ public class Main extends Application {
 				instructionStage.show();
 			});
 			
-			//menuFile.getItems().add(menuMealList);
 			dropMenu.getMenus().addAll(menuFile, menuHelp);
 			HBox dropMenuPanel = new HBox(dropMenu);
 			foodListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			foodListView.setPrefHeight(700);
 			foodInput.setPromptText("food");
-			//calorieInput.setPromptText("calorie");
 			nameFilter.setPromptText("Enter name search");
 			VBox addNewFoodSendToMeal = new VBox();
 			Button addFood = new Button("Add New Food");
 			Button sendToMeal = new Button("Send to Meal");
+			Button showRules = new Button("Show Rules");
 			Button deleteButton = new Button("Delete");
 			Button nameFilterButton = new Button("Apply Name Filter");
 			Button removeNameFilterButton = new Button("Remove Name Filter");
 			
-			addNewFoodSendToMeal.getChildren().addAll(addFood, sendToMeal);
+			addNewFoodSendToMeal.getChildren().addAll(addFood, sendToMeal,showRules);
 			
 			nameFilterButton.setOnAction(e -> {
 				String inputText = nameFilter.getText();
-				//System.out.println(inputText);
 				filteredByNameList = foodData.filterByName(inputText);
 				List<List<FoodItem>> listsToIntersect = new ArrayList<List<FoodItem>>();
 				listsToIntersect.add(filteredByNameList);
@@ -243,7 +237,6 @@ public class Main extends Application {
 				
 				foodObservableList.setAll(intersection);
 				
-				//foodListView.setItems(FXCollections.observableList(intersection));
 				
 			});
 			
@@ -254,9 +247,6 @@ public class Main extends Application {
 			
 			deleteButton.setOnAction((ActionEvent e) -> {
 				ObservableList<FoodItem> removeItems = foodListView.getSelectionModel().getSelectedItems();
-				//foodListView.getItems().removeAll(delete);
-				//foodListView.getItems().remove(foodInput.getText());
-				//foodInput.clear();
 			});
 			
 			sendToMeal.setOnAction((ActionEvent e) -> {
@@ -265,16 +255,24 @@ public class Main extends Application {
 				mealObservableList.addAll(addItems);
 				
 			});
+			showRules.setOnAction((ActionEvent e) ->{
+				Stage ruleStage = new Stage();
+				BorderPane rulePane = new BorderPane();
+				Label ruleLabel = new Label();
+				String rules = rulesList.stream().collect(Collectors.joining("\n"));
+				ruleLabel.setWrapText(true);
+				ruleLabel.setText(rules);
+				rulePane.setTop(ruleLabel);
+				Scene ruleScene = new Scene(rulePane, 350, 350);
+				ruleStage.setTitle("Rules");
+				ruleStage.setScene(ruleScene);
+				ruleStage.show();
+			});
 			
 			HBox listViewAddFoodHBox = new HBox();
 			listViewAddFoodHBox.getChildren().addAll(foodListView, addNewFoodSendToMeal);
 			hbox2.getChildren().addAll(nameFilter,nameFilterButton, removeNameFilterButton);
-			//hbox.getChildren().addAll(foodInput, calorieInput, addFood, deleteButton);
 			addFood.setOnAction((ActionEvent e) -> {
-				//if(!(foodInput.getText().equals(""))) {
-				//	listView.getItems().add(foodInput.getText());
-				//}
-				//foodInput.clear();
 				Stage addFoodWindow = new Stage();
 				BorderPane bp2 = new BorderPane();
 				VBox vbox2 = new VBox();
@@ -318,7 +316,6 @@ public class Main extends Application {
 					      System.out.println("Empty Nutrient Value");
 					     }
 					 
-					 //foodListView.setItems(foodObservableList);
 					
 					 addFoodWindow.close();
 				});
@@ -370,7 +367,6 @@ public class Main extends Application {
 			Label foodCountDescription = new Label("Food Count");
 			HBox foodCountListLabels = new HBox();
 			foodListLabel.setStyle("-fx-font: 24 segoeui;");
-			//foodCountListLabels.getChildren().add(foodListLabel);
 			foodCountListLabels.getChildren().add(foodCountDescription);
 			foodCountListLabels.getChildren().add(foodCountLabel);
 			vBoxLeft.getChildren().add(foodListLabel);
@@ -398,12 +394,6 @@ public class Main extends Application {
 			addNewFoodSendToMeal.setPadding(new Insets(0,5,5,10));
 			addNewFoodSendToMeal.setSpacing(10);
 			
-			//vBoxLeft.setPadding(new Insets(5,5,5,5));
-			//vBoxRight.setPadding(new Insets(5,5,5,5));
-			
-			
-			//listViewAddFoodHBox.setPadding(new Insets(10,5,5,10));
-			//listViewAddFoodHBox.setSpacing(10);
 			
 			nutrientQuery.setPadding(new Insets(10,5,5,10));
 			nutrientQuery.setSpacing(10);;
@@ -426,11 +416,7 @@ public class Main extends Application {
 		    root.setLeft(vBoxLeft);
 		    root.setRight(vBoxRight);
 		    
-		    //Hard coding lists for demonstration puroses
-		    //foodListView.getItems().addAll("Apple", "Banana", "Cake", "Muffin");
-		    //mealListView.getItems().addAll("Apple", "Muffin");
-		    
-		    //
+
 		    HBox centerBox = new HBox();
 		    centerBox.setStyle("-fx-background-color: #7aadff");
 		    root.setCenter(centerBox);
@@ -442,11 +428,6 @@ public class Main extends Application {
 		} catch(Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	public ObservableList getFood() {
-		ObservableList food = FXCollections.observableArrayList();
-		return food;
 	}
 	public static void main(String[] args) {
 		launch(args);
