@@ -84,4 +84,8 @@ public class FoodItem {
         return 0;
     }
     
+    public String toString() {
+    	return getName();
+    }
+    
 }

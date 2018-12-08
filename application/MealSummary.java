@@ -36,7 +36,8 @@ public class MealSummary {
 		Iterator<List<FoodItem>> iterator = foodLists.iterator();
 		List<FoodItem> intersectedList;
 		if(iterator.hasNext()) {
-			intersectedList = iterator.next();
+			intersectedList = new ArrayList<FoodItem>(iterator.next());
+			//need to copy list to avoid changing what was passed in
 		
 			while(iterator.hasNext()) {
 				List<FoodItem> curList = iterator.next();
