@@ -30,7 +30,7 @@ public interface BPTreeADT<K, V> {
      *         return all the values with the corresponding 
      *      keys >= 2.5
      *      
-     * If key is null or not found, return empty list.
+     * If key is null, return empty list.
      * If comparator is null, empty, or not according
      * to required form, return empty list.
      * 

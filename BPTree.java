@@ -29,7 +29,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     // Branching factor is the number of children nodes 
     // for internal nodes of the tree
     private int branchingFactor;
-    
+    // FIXME: Add default branching factor?
     
     /**
      * Public constructor
@@ -256,7 +256,20 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		sibling = child.split();
         		siblingKey = sibling.getFirstLeafKey();
         		// FIXME: I have no idea how to get the parent to point to the sibling node.
+        		// Ideas: Just add it to the list of keys?
+        		
         	}
+        }
+        
+        /**
+         * Private helper method that returns the position in the list that a key should be
+         * added to
+         * 
+         * @param key The key to insert.
+         * @return The int position in the list.
+         */
+        private int positionFinder(K key) {
+        	return -1;
         }
         
         /**
