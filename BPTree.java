@@ -265,10 +265,41 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * Private helper method that returns the position in the list that a key should be
          * added to
          * 
+         * FIXME: Can we optimize this by checking the first and last keys first?
+         * 
          * @param key The key to insert.
          * @return The int position in the list.
          */
         private int positionFinder(K key) {
+        	// Variable declaration
+        	int i = 0; // Loop index.
+        	K key1; // K objects will hold the keys in current and next position.
+        	K key2;
+        	K lastKey; // K object will hold the key in the last index.
+        	int numKeys; // Holds number of keys in list.
+        	
+        	numKeys = keys.size();
+        	lastKey = keys.get(numKeys - 1);
+        	// Loop through the keys list to find a position.
+        	for (i = 0; i < numKeys - 1; i++) { // FIXME: Require -1?
+        		key1 = keys.get(i);
+        		key2 = keys.get(i + 1);
+        		
+        		// Case: Key is less or equal to current key.
+        		if (key.compareTo(key1) <= 0) {
+        			return i;
+        		}
+        		// Case: Key is greater than current but less than or equal to next key.
+        		else if (key.compareTo(key1) > 0 && key.compareTo(key2) <= 0) {
+        			return i + 1;
+        		}
+        		// Case: Key is greater than the last key.
+        		else if (key.compareTo(lastKey) > 0) {
+        			return numKeys + 1;
+        			
+        		}
+        	}
+        	// FIXME: What to return if no cases?
         	return -1;
         }
         
@@ -305,6 +336,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	int i = 0; // Loop index
         	K key1; // K objects will hold the keys in current and next position.
         	K key2;
+        	K lastKey; // K object will hold the last key index.
         	int numKeys; // Holds number of keys in node.
         	
         	// If the node is a leaf, then we have found the node to insert into.
@@ -313,6 +345,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	}
         	
         	numKeys = node.keys.size();
+        	lastKey = node.keys.get(numKeys - 1); // Getting last index key.
+        	
         	// Else, traverse down the correct path.
         	for (i = 0; i < numKeys - 1; i++) { // FIXME Add case where -1 not applicable?
         		key1 = node.keys.get(i);
@@ -326,8 +360,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		else if (key.compareTo(key1) > 0 && key.compareTo(key2) < 0) {
         			insertHelper(key, value, children.get(i + 1));
         		}
-        		// Case: The key is greater than the last key.
-        		else {
+        		// Case: The key is greater than the last key. FIXME: Is this correct?
+        		else if (key.compareTo(lastKey) > 0) {
         			insertHelper(key, value, children.get(numKeys - 1));
         		}
         	}
