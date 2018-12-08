@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
@@ -39,8 +40,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 public class Main extends Application {
 	ObservableList<FoodItem> foodObservableList;
 	ListView<FoodItem> foodListView;
-	List<String> foodList;
-	FilteredList<FoodItem> filteredFoodList;
+	//List<String> foodList;
+	
+	List<FoodItem> filteredByNutrientList;
+	List<FoodItem> filteredByNameList;
+	
 	ObservableList<FoodItem> mealObservableList = FXCollections.observableArrayList();
 	
 	FoodData foodData;
@@ -50,6 +54,7 @@ public class Main extends Application {
 	TextField foodInput,calorieInput, nameFilter;
 	MenuBar dropMenu;
 	VBox vBoxRight;
+	Label foodCountLabel;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -150,20 +155,33 @@ public class Main extends Application {
 			// Drop down menu - MenuBar
 			FileChooser fileChooser = new FileChooser();
 			dropMenu = new MenuBar();
-			Menu menuFile = new Menu("Load Food Data");
+			Menu menuFile = new Menu("File");
 			Menu menuHelp = new Menu("Help");
 			menuFile.setOnShowing(e -> {  }); // TODO: Add events
 			menuFile.setOnShown  (e -> {  });
 			menuFile.setOnHiding (e -> {  });
 			menuFile.setOnHidden (e -> {  });
 			MenuItem menuFoodList = new MenuItem("Open FoodList File...");
+			MenuItem menuSaveList = new MenuItem("Save FoodList");
 			MenuItem menuHelpItem = new MenuItem("Show Instructions");
-			menuFoodList.setOnAction(e -> {
-			    fileChooser.showOpenDialog(primaryStage);
-			});
+			
 			menuFile.getItems().add(menuFoodList);
+			menuFile.getItems().add(menuSaveList);
 			menuHelp.getItems().add(menuHelpItem);
-			MenuItem menuMealList = new MenuItem("Load Meal List");
+			
+			menuSaveList.setOnAction(e ->  {
+				File saveFile = fileChooser.showSaveDialog(primaryStage);
+				if(foodObservableList != null) {
+					FoodData savedData = new FoodData();
+					
+					for(FoodItem food : foodObservableList) {
+						savedData.addFoodItem(food);
+					}
+					
+					savedData.saveFoodItems(saveFile.getAbsolutePath());
+				}
+			});
+			
 			menuFoodList.setOnAction(e -> {
 			    File selectedFile = fileChooser.showOpenDialog(primaryStage);
 				String filePath = selectedFile.getAbsolutePath();
@@ -171,7 +189,10 @@ public class Main extends Application {
 				foodData = new FoodData();
 				foodData.loadFoodItems(filePath);
 				foodObservableList = FXCollections.observableArrayList(foodData.getAllFoodItems());
+				filteredByNutrientList = foodData.getAllFoodItems();
+				filteredByNameList = foodData.getAllFoodItems();
 				foodListView.setItems(foodObservableList.sorted());
+				foodCountLabel.textProperty().bind((Bindings.size(foodObservableList).asString()));
 				
 			});
 			
@@ -207,23 +228,28 @@ public class Main extends Application {
 			Button sendToMeal = new Button("Send to Meal");
 			Button deleteButton = new Button("Delete");
 			Button nameFilterButton = new Button("Apply Name Filter");
-			Button removeNameFilter = new Button("Remove Name Filter");
-			Button nameUnfilterButton = new Button("Unfilter");
+			Button removeNameFilterButton = new Button("Remove Name Filter");
 			
 			addNewFoodSendToMeal.getChildren().addAll(addFood, sendToMeal);
 			
 			nameFilterButton.setOnAction(e -> {
 				String inputText = nameFilter.getText();
-				System.out.println(inputText);
-				List<FoodItem> filteredItems = foodData.filterByName(inputText);
-				List<FoodItem> currentItems = foodListView.getItems();
+				//System.out.println(inputText);
+				filteredByNameList = foodData.filterByName(inputText);
 				List<List<FoodItem>> listsToIntersect = new ArrayList<List<FoodItem>>();
-				listsToIntersect.add(filteredItems);
-				listsToIntersect.add(currentItems);
+				listsToIntersect.add(filteredByNameList);
+				listsToIntersect.add(filteredByNutrientList);
 				List<FoodItem> intersection = MealSummary.intersectLists(listsToIntersect);
 				
-				foodListView.setItems(FXCollections.observableList(intersection));
+				foodObservableList.setAll(intersection);
 				
+				//foodListView.setItems(FXCollections.observableList(intersection));
+				
+			});
+			
+			removeNameFilterButton.setOnAction(e -> {
+				filteredByNameList = foodData.getAllFoodItems();
+				foodObservableList.setAll(filteredByNutrientList);
 			});
 			
 			deleteButton.setOnAction((ActionEvent e) -> {
@@ -242,7 +268,7 @@ public class Main extends Application {
 			
 			HBox listViewAddFoodHBox = new HBox();
 			listViewAddFoodHBox.getChildren().addAll(foodListView, addNewFoodSendToMeal);
-			hbox2.getChildren().addAll(nameFilter,nameFilterButton, removeNameFilter);
+			hbox2.getChildren().addAll(nameFilter,nameFilterButton, removeNameFilterButton);
 			//hbox.getChildren().addAll(foodInput, calorieInput, addFood, deleteButton);
 			addFood.setOnAction((ActionEvent e) -> {
 				//if(!(foodInput.getText().equals(""))) {
@@ -282,7 +308,12 @@ public class Main extends Application {
 					      foodItem.addNutrient("fiber", Double.parseDouble(fiberGrams.getText()));
 					      foodItem.addNutrient("protein", Double.parseDouble(proteinGrams.getText()));
 					      foodData.addFoodItem(foodItem);
+					      if(foodObservableList == null) {
+					    	  foodObservableList = FXCollections.observableArrayList();
+					    	  foodCountLabel.textProperty().bind((Bindings.size(foodObservableList).asString()));
+					      }
 					      foodObservableList.add(foodItem);
+					      
 					     }catch(NumberFormatException j){
 					      System.out.println("Empty Nutrient Value");
 					     }
@@ -313,33 +344,49 @@ public class Main extends Application {
 				String textInput = nutrientQueryText.getText();
 				rulesList.add(textInput);
 				
-				ObservableList<FoodItem> filtered = FXCollections.observableList(foodData.filterByNutrients(rulesList));
+				filteredByNutrientList = foodData.filterByNutrients(rulesList);
+				
 				List<List<FoodItem>> foodLists = new ArrayList<List<FoodItem>>();
-				foodLists.add(filtered);
-				foodLists.add(foodListView.getItems());
-				foodListView.setItems(FXCollections.observableList(MealSummary.intersectLists(foodLists)));
+				foodLists.add(filteredByNutrientList);
+				foodLists.add(filteredByNameList);
+				foodObservableList.setAll(FXCollections.observableList(MealSummary.intersectLists(foodLists)));
 				
 			});
 			
 			clearNutrientQuery.setOnAction(e -> {
-				foodListView.setItems(foodObservableList);
 				rulesList.clear();
+				filteredByNutrientList = foodData.getAllFoodItems();
+				foodObservableList.setAll(filteredByNameList);
+				for(FoodItem food : filteredByNameList) {
+					System.out.println(food.getID());
+				}
+				
 			});
 			
 			
 			
 			Label foodListLabel = new Label("Food List");
+			foodCountLabel = new Label();
+			Label foodCountDescription = new Label("Food Count");
+			HBox foodCountListLabels = new HBox();
 			foodListLabel.setStyle("-fx-font: 24 segoeui;");
-		    //vBoxLeft.getChildren().add(foodListView);
+			//foodCountListLabels.getChildren().add(foodListLabel);
+			foodCountListLabels.getChildren().add(foodCountDescription);
+			foodCountListLabels.getChildren().add(foodCountLabel);
 			vBoxLeft.getChildren().add(foodListLabel);
 			vBoxLeft.getChildren().add(listViewAddFoodHBox);
 		    vBoxLeft.getChildren().add(hbox2);
 		    vBoxLeft.getChildren().add(nutrientQuery);
 		    
+		    addNewFoodSendToMeal.getChildren().add(foodCountListLabels);
+		    
 		    //POPUP FOR INSTRUCTIONS
 		    
 
 			//spacing and padding start
+		    
+		    foodCountListLabels.setPadding(new Insets(10,0,0,10));
+		    foodCountListLabels.setSpacing(10);
 			listViewAddFoodHBox.setPadding(new Insets(0,5,0,10));
 			listViewAddFoodHBox.setSpacing(10);
 			
