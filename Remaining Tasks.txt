@@ -1,0 +1,18 @@
+Remaining Tasks
+
+User Input Validation and Exception/Error Checking
+1. Refuse to accept negative or alphanumeric values in the Add Food menu
+2. Check for required formatting of input rules (right now there are exceptions if they don't type in the rule perfectly)
+3. Be able to remove a rule one at a time instead of clearing all at once
+
+Commenting and Organization
+1. Main method has stuff all over the place
+2. Javadocs and algorithm explanation comments
+3. Rename MealSummary static helper class to something else (easy REFACTOR in eclipse)
+
+BP Tree
+1. Need independent functionality of BP Tree so that it passes JUnit Tests
+2. Utilize BP tree to obtain the filtered nutrients (integrate BP tree into project)
+
+Checking with TA's in Lab
+1. Identify potential areas where we would be losing points from the same people who will be grading this.
