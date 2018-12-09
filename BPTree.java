@@ -274,12 +274,13 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		sibling = split();
         		siblingKey = sibling.getFirstLeafKey();
         		
-        		// Putting children into the newly created InternalNode, which is now the root.
+        		// Putting children into the newly created InternalNode.
         		newINRoot.keys.add(siblingKey);
-//        		newINRoot.children.add(this); // FIXME: This used in place of children
+//        		newINRoot.children.add(this); // FIXME: 'this' used in place of children?
         		newINRoot.children.addAll(children);
         		newINRoot.children.add(sibling);
         		
+        		// Newly created InternalNode is now the root.
         		root = newINRoot;
         	}
         }
