@@ -227,7 +227,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#isOverflow()
          */
         boolean isOverflow() {
-            return keys.size() > branchingFactor;
+            return keys.size() > branchingFactor; // FIXME: Keys or children?
         }
         
         /**
@@ -290,8 +290,24 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#split()
          */
         Node split() {
-            // TODO : Complete
-            return null;
+            // Variable declaration
+        	int halfKey; // Holds index for the half-way position of keys.
+        	int halfChildren; // Holds index for the half-way position of children.
+        	InternalNode sibling = new InternalNode(); // Holds new sibling node.
+        	
+        	halfKey = keys.size() / 2;
+        	halfChildren = children.size() / 2;
+        	
+        	// subList allows us to add keys from the half-way index to the end. 
+        	sibling.keys.addAll(keys.subList(halfKey, keys.size()));
+        	// Clears keys from original keys that we added to the new sibling.
+        	keys.subList(halfKey, keys.size()).clear();
+        	
+        	// Adding new sibling's children.
+        	sibling.children.addAll(children.subList(halfChildren, children.size()));
+        	children.subList(halfChildren, children.size()).clear();
+        	
+            return sibling;
         }
         
         /**
