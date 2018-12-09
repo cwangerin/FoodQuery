@@ -391,7 +391,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		key1 = keys.get(i);
         		key2 = keys.get(i + 1);
         		
-        		// Case: Key is less or equal to current key.
+        		// Case: Key is less than or equal to current key.
         		if (key.compareTo(key1) <= 0) {
         			return i;
         		}
@@ -401,7 +401,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		}
         		// Case: Key is greater than the last key.
         		else if (key.compareTo(lastKey) > 0) {
-        			return numKeys + 1;
+        			return numKeys + 1; // FIXME: Shouldn't this be - 1?
         			
         		}
         	}
@@ -464,7 +464,13 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#insert(Comparable, Object)
          */
         void insert(K key, V value) {
-            // TODO : Complete
+        	if (keys.size() == 0) {
+        		keys.add(key);
+        		values.add(value);
+        	}
+        	else {
+        		insertHelper(key, value);
+        	}
         }
         
         /**
@@ -485,6 +491,68 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             return null;
         }
         
+        /* Private helper methods */
+        
+        /**
+         * Private helper method that assists in inserting a key, value pair.
+         * 
+         * @param key The key of value we wish to insert.
+         * @param value The value we wish to insert.
+         */
+        private void insertHelper(K key, V value) {
+        	// Variable declaration
+        	int i = 0; // Loop index.
+        	K key1; // K objects will hold the keys in current and next position.
+        	K key2;
+        	K lastKey; // K object will hold the key in the last index.
+        	int numKeys; // Holds number of keys in list.
+        	boolean loop; // True if key isn't <= to first or >= to last.
+        	
+        	numKeys = keys.size();
+        	lastKey = keys.get(numKeys - 1);
+        	loop = true;
+        	
+        	// Add to beginning if less than or equal to the first.
+        	if (key.compareTo(keys.get(0)) <= 0) {
+        		keys.add(0, key);
+        		values.add(0, value); // FIXME: Do I need a separate method for vals?
+        		loop = false;
+        	}
+        	// Add to end if greater than or equal to last.
+        	else if (key.compareTo(lastKey) >= 0) {
+        		keys.add(key);
+        		values.add(value); // FIXME: Do I need a separate method for vals?
+        		loop = false;
+        	}
+        	
+        	if (loop) {
+	        	for (i = 0; i < numKeys - 1; i++) { // FIXME: Requires -1?
+	        		key1 = keys.get(i);
+	        		key2 = keys.get(i + 1);
+	        		
+	        		/*// Case: Key is less than or equal to current key. // FIXME: Required?
+	        		if (key.compareTo(key1) <= 0) {
+	        			keys.add(i, key);
+	        			values.add(i, value);
+	        			break;
+	        		}*/
+	        		
+	        		// Case: Key is greater than current but less than or equal to next key.
+	        		if (key.compareTo(key1) > 0 && key.compareTo(key2) <= 0) {
+	        			keys.add(i + 1, key);
+	        			values.add(i + 1, value); // FIXME: Do I need a separate method for vals?
+	        			
+	        		}
+	        		
+	        		/*// Case: Key is greater than the last key. // FIXME: Required?
+	        		else if (key.compareTo(lastKey) > 0) {
+	        			keys.add(numKeys - 1, key);
+	        			values.add(numKeys - 1, value);
+	        		} */
+	        	}
+        	}
+        }
+        
     } // End of class LeafNode
     
     
@@ -496,7 +564,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
      * @param args
      */
     public static void main(String[] args) {
-        // create empty BPTree with branching factor of 3
+        /*// create empty BPTree with branching factor of 3
         BPTree<Double, Double> bpTree = new BPTree<>(3);
 
         // create a pseudo random number generator
@@ -519,7 +587,15 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             System.out.println("\n\nTree structure:\n" + bpTree.toString());
         }
         List<Double> filteredValues = bpTree.rangeSearch(0.2d, ">=");
-        System.out.println("Filtered values: " + filteredValues.toString());
+        System.out.println("Filtered values: " + filteredValues.toString());*/
+    	
+    	BPTree<Integer, Integer> bpTree = new BPTree<>(3);
+    	
+    	bpTree.insert(0, 0);System.out.println("\n\nTree structure:\n" + bpTree.toString());
+    	bpTree.insert(5, 5);System.out.println("\n\nTree structure:\n" + bpTree.toString());
+    	bpTree.insert(10, 10);System.out.println("\n\nTree structure:\n" + bpTree.toString());
+    	bpTree.insert(3, 3);System.out.println("\n\nTree structure:\n" + bpTree.toString());
+    	bpTree.insert(8, 8);System.out.println("\n\nTree structure:\n" + bpTree.toString());
     }
 
 } // End of class BPTree
