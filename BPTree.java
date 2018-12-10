@@ -227,7 +227,11 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#isOverflow()
          */
         boolean isOverflow() {
-            return children.size() > branchingFactor; // FIXME: Keys or children?
+        	
+//        	System.out.println("children size: " + children.size() + ". bFactor: "
+//        			+ branchingFactor); // TODO: Delete me - for testing only
+            
+        	return children.size() > branchingFactor; // FIXME: Keys or children?
         }
         
         /**
@@ -250,6 +254,9 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	// Otherwise, calls insertHelper to find the child to insert key into.
         	else {
         		child = insertHelper(key, value, root);
+        		
+//        		System.out.println(child.keys); // TODO: Delete me - for testing only!
+        		
         		child.insert(key, value);
         	}
         	
@@ -343,28 +350,42 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	}
         	
         	numKeys = node.keys.size();
-        	lastKey = node.keys.get(numKeys - 1); // Getting last key index.
+        	lastKey = node.keys.get(numKeys - 1); // Getting last key.
         	
+//        	System.out.println(keys); // TODO: Delete me - for testing only!
+        	
+        	// Case: If the key is less than or equal to the first key, go down left.
+        	if (key.compareTo(node.keys.get(0)) <= 0) {
+        		return insertHelper(key, value, children.get(0));
+        	}
+        	
+        	// Case: If the key is greater than or equal to the last key, go down right.
+        	else if (key.compareTo(lastKey) >= 0) {
+        		return insertHelper(key, value, children.get(children.size() - 1));
+        	}
+        		
         	// Else, traverse down the correct path.
         	for (i = 0; i < numKeys - 1; i++) { // FIXME Add case where -1 not applicable?
         		key1 = node.keys.get(i);
         		key2 = node.keys.get(i + 1);
         		
-        		// Case: The key is less than or equal to the first key.
+        		/*// Case: The key is less than or equal to the first key.
         		if (key.compareTo(key1) <= 0) {
         			insertHelper(key, value, children.get(i));
-        		}
+        		}*/
+        	
         		// Case: The key is greater than the first key, but less or equal to the second.
-        		else if (key.compareTo(key1) > 0 && key.compareTo(key2) < 0) {
-        			insertHelper(key, value, children.get(i + 1));
+        		if (key.compareTo(key1) > 0 && key.compareTo(key2) < 0) {
+        			return insertHelper(key, value, children.get(i + 1));
         		}
-        		// Case: The key is greater than the last key. FIXME: Is this correct?
+        	
+        		/*// Case: The key is greater than the last key. FIXME: Is this correct?
         		else if (key.compareTo(lastKey) > 0) {
         			insertHelper(key, value, children.get(numKeys - 1));
-        		}
+        		}*/
         	}
         	// FIXME: What to return if none of the cases are met?
-        	return null;
+        	return node;
         }
         
         /**
@@ -386,23 +407,25 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	
         	numKeys = keys.size();
         	lastKey = keys.get(numKeys - 1);
+        	
+        	// Case: Key is less than or equal to current key.
+    		if (key.compareTo(keys.get(0)) <= 0) {
+    			return i;
+    		}
+    		// Case: Key is greater than the last key.
+    		else if (key.compareTo(lastKey) > 0) {
+    			return numKeys - 1; // FIXME: Shouldn't this be - 1?
+    			
+    		}
+        	
         	// Loop through the keys list to find a position.
         	for (i = 0; i < numKeys - 1; i++) { // FIXME: Requires -1?
         		key1 = keys.get(i);
         		key2 = keys.get(i + 1);
         		
-        		// Case: Key is less than or equal to current key.
-        		if (key.compareTo(key1) <= 0) {
-        			return i;
-        		}
         		// Case: Key is greater than current but less than or equal to next key.
-        		else if (key.compareTo(key1) > 0 && key.compareTo(key2) <= 0) {
+        		if (key.compareTo(key1) > 0 && key.compareTo(key2) <= 0) {
         			return i + 1;
-        		}
-        		// Case: Key is greater than the last key.
-        		else if (key.compareTo(lastKey) > 0) {
-        			return numKeys + 1; // FIXME: Shouldn't this be - 1?
-        			
         		}
         	}
         	// FIXME: What to return if no cases match?
@@ -456,7 +479,12 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#isOverflow()
          */
         boolean isOverflow() {
-            return values.size() > branchingFactor; // FIXME: Keys or values?
+        	
+//        	System.out.println("values size: " + values.size() + ". bFactor: " 
+//        			+ branchingFactor); // Delete me - for testing only
+        	
+            return values.size() >= branchingFactor; // FIXME: Keys or values?
+            										 // FIXME: Needs > or >=?
         }
         
         /**
@@ -478,27 +506,25 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		insertHelper(key, value);
         	}
         	
-        	if (root.isOverflow()) {
-        		sibling = null;
-            	// Checking if the root has overflow, then splitting if so.
-            	if (root.isOverflow()) {
-            		// If the root has overflow, must create a new InternalNode to hold the children.
-            		newINRoot = new InternalNode();
-            		
-            		// Getting sibling's key.
-            		sibling = split();
-            		siblingKey = sibling.getFirstLeafKey();
-            		
-            		// Putting children into the newly created InternalNode.
-            		newINRoot.keys.add(siblingKey);
-            		newINRoot.children.add(this); // FIXME: 'this' used in place of children?
+			// Checking if the root has overflow, then splitting if so.
+			if (root.isOverflow()) {
+				sibling = null; // FIXME: Required?
+				// Must create a new InternalNode to hold the children.
+				newINRoot = new InternalNode();
+
+				// Getting sibling's key.
+				sibling = split();
+				siblingKey = sibling.getFirstLeafKey();
+
+				// Putting children into the newly created InternalNode.
+				newINRoot.keys.add(siblingKey);
+				newINRoot.children.add(this); // FIXME: 'this' used in place of children?
 //            		newINRoot.children.addAll(children);
-            		newINRoot.children.add(sibling);
-            		
-            		// Newly created InternalNode is now the root.
-            		root = newINRoot;
-            	}
-        	}
+				newINRoot.children.add(sibling);
+
+				// Newly created InternalNode is now the root.
+				root = newINRoot;
+			}
         }
         
         /**
@@ -524,9 +550,14 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	values.subList(halfVals, values.size()).clear();
         	
         	// Updating sibling links.
-        	next.previous = sibling; // FIXME: Correct?
-        	sibling.next = next;
-        	next = sibling;
+        	if (next != null) {
+        		next.previous = sibling; // FIXME: Correct?
+        		sibling.next = next;
+            	next = sibling;
+        	}
+        	else {
+        		next = sibling;
+        	}
         	
             return sibling;
         }
@@ -560,6 +591,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	numKeys = keys.size();
         	lastKey = keys.get(numKeys - 1);
         	loop = true;
+        	
+//        	System.out.println(keys); // TODO: Delete me - for testing only
         	
         	// Add to beginning if less than or equal to the first.
         	if (key.compareTo(keys.get(0)) <= 0) {
@@ -640,11 +673,11 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     	
     	BPTree<Integer, Integer> bpTree = new BPTree<>(3);
     	
-    	bpTree.insert(0, 0);System.out.println("Tree structure:\n" + bpTree.toString());
-    	bpTree.insert(5, 5);System.out.println("Tree structure:\n" + bpTree.toString());
-    	bpTree.insert(10, 10);System.out.println("Tree structure:\n" + bpTree.toString());
-    	bpTree.insert(3, 3);System.out.println("Tree structure:\n" + bpTree.toString());
-    	bpTree.insert(8, 8);System.out.println("Tree structure:\n" + bpTree.toString());
+    	bpTree.insert(0, 0);System.out.println("Tree structure: (Insert 0)\n" + bpTree.toString());
+    	bpTree.insert(5, 5);System.out.println("Tree structure: (Insert 5)\n" + bpTree.toString());
+    	bpTree.insert(10, 10);System.out.println("Tree structure: (Insert 10)\n" + bpTree.toString());
+    	bpTree.insert(3, 3);System.out.println("Tree structure: (Insert 3)\n" + bpTree.toString());
+    	bpTree.insert(8, 8);System.out.println("Tree structure: (Insert 8)\n" + bpTree.toString());
     }
 
 } // End of class BPTree
