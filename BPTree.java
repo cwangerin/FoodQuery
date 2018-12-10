@@ -1,3 +1,5 @@
+package application;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -562,14 +564,95 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             return sibling;
         }
         
+       
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         /**
          * (non-Javadoc)
          * @see BPTree.Node#rangeSearch(Comparable, String)
          */
         List<V> rangeSearch(K key, String comparator) {
             // TODO : Complete
-            return null;
+            List<V> values = new LinkedList<>();
+            
+            if(key == null) {
+                return values;
+            }
+            if(comparator.equals(null) || comparator.equals("")) {
+                return values;
+            }
+            if(!comparator.equals("<=") && !comparator.equals("==") && !comparator.equals(">=")) {
+                return values;
+            }
+            //traverse bpt check if each value >=,==,<=
+            LeafNode node = keys.get(root.keys.get(0));
+            while(node.next != null) {
+                List<K> keys = node.keys;
+                List<V> keyValues = node.values;
+                //for(V value : list) {  
+                //}
+                for(K currentKey : keys) {                      //Traverses keys of a node
+                    if(comparator.equals("<=")) {               //If comparator is <= check if currnetkey of node are <= key
+                        if(currentKey.compareTo(key) <= 0) {
+                            values.add(keyValues.get(keys.indexOf(currentKey)));
+                        }
+                    }
+                    if(comparator.equals("==")) {               //If comparator is == check if currentkey of node are equal to key
+                        if(node.equals(key)) {
+                            values.add(keyValues.get(keys.indexOf(currentKey)));
+                        }
+                    }
+                    if(comparator.equals(">=")) {               //If comparator is >= check if currentkey of node are >= key
+                        if(currentKey.compareTo(key) >= 0) {          
+                            values.add(keyValues.get(keys.indexOf(currentKey)));
+                        }
+                    }
+                }   
+                node = node.next;
+            }
+            
+            
+            
+            
+            return values;
         }
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         /* Private helper methods */
         
