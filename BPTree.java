@@ -1,4 +1,4 @@
-//package application;
+package application;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -630,7 +630,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#rangeSearch(Comparable, String)
          */
         List<V> rangeSearch(K key, String comparator) {
-            /*// TODO : Complete
+            // TODO : Complete
             List<V> values = new LinkedList<>();
             
             if(key == null) {
@@ -667,7 +667,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
                     }
                 }   
                 node = node.next;
-            }*/
+            }
             
             
             
