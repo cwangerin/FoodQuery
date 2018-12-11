@@ -290,11 +290,11 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		// Putting children into the newly created InternalNode.
         		newINRoot.keys.add(siblingKey);
         		
-        		System.out.println("this: " + this 			// TODO: Delete me - for testing only
-        					 + "\t this.children: " + this.children
-        					 + "\t children.get(0): " + children.get(0)
-        					 + "\t sibling: " + sibling
-        					 + "\t sibling.keys: " + sibling.keys);
+//        		System.out.println("this: " + this 			// TODO: Delete me - for testing only
+//        					 + "\t this.children: " + this.children
+//        					 + "\t children.get(0): " + children.get(0)
+//        					 + "\t sibling: " + sibling
+//        					 + "\t sibling.keys: " + sibling.keys);
         		
         		newINRoot.children.add(this); // FIXME: 'this' used in place of children?
 //        		newINRoot.children.addAll(children);
@@ -368,8 +368,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	K lastKey; // K object will hold the last key index.
         	int numKeys; // Holds number of keys in node.
         	
-//        	System.out.println("keys: " + node.keys + ".\t IsLeaf: "
-//        			+ node.leaf + ".\t    children: " + children); // Delete me - for testing only!
+        	System.out.println("keys: " + node.keys + ".\t IsLeaf: "
+        			+ node.leaf + ".\t    children: " + children); // Delete me - for testing only!
         	
         	// If the node is a leaf, then we have found the node to insert into.
         	if (node.leaf) {
@@ -788,7 +788,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     	bpTree.insert(8, 9);System.out.println("Tree structure: (Insert 8)\n" + bpTree.toString());
     	bpTree.insert(6, 7);System.out.println("Tree structure: (Insert 6)\n" + bpTree.toString());
     	bpTree.insert(9, 10);System.out.println("Tree structure: (Insert 9)\n" + bpTree.toString());
-//    	bpTree.insert(1, 2);System.out.println("Tree structure: (Insert 1)\n" + bpTree.toString());
+    	bpTree.insert(1, 2);System.out.println("Tree structure: (Insert 1)\n" + bpTree.toString());
     	
 //    	BPTree<Integer, Integer> bpTree = new BPTree<>(3);
 //    	bpTree.insert(5, 5);System.out.println("Tree structure:\n" + bpTree.toString());
