@@ -291,8 +291,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		newINRoot.keys.add(siblingKey);
         		
         		System.out.println("this: " + this 			// TODO: Delete me - for testing only
-        					 + "\t siblingKey: " + siblingKey
-        					 + "\t Children: " + children
+        					 + "\t this.children: " + this.children
         					 + "\t children.get(0): " + children.get(0)
         					 + "\t sibling: " + sibling
         					 + "\t sibling.keys: " + sibling.keys);
