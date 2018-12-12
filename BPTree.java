@@ -271,6 +271,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		siblingKey = sibling.getFirstLeafKey();
         		// Making sure to insert the key into the correct index.
         		index = positionFinder(siblingKey);
+
         		keys.add(index, siblingKey);
         		// index needs + 1 because the key we add to the parent already exists.
         		children.add(index + 1, sibling);
@@ -553,20 +554,23 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	InternalNode newINRoot; // To hold the new root if the root has overflow.
         	K siblingKey; // To hold the sibling's first key.
         	
+//        	System.out.println("before -> keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
+
         	if (keys.size() == 0) {
         		keys.add(key);
         		values.add(value);
+//        		next = this;
         	}
         	else {
         		insertHelper(key, value);
         	}
-        	
+        	        	
 			// Checking if the root has overflow, then splitting if so.
 			if (root.isOverflow()) {
 				sibling = null; // FIXME: Required?
 				// Must create a new InternalNode to hold the children.
 				newINRoot = new InternalNode();
-
+				
 				// Getting sibling's key.
 				sibling = split();
 				siblingKey = sibling.getFirstLeafKey();
@@ -576,10 +580,13 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 				newINRoot.children.add(this); // Adding this node to children.
 //            		newINRoot.children.addAll(children);
 				newINRoot.children.add(sibling);
-
+				
 				// Newly created InternalNode is now the root.
 				root = newINRoot;
 			}
+			
+//        	System.out.println("after -> keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
+
         }
         
         /**
@@ -605,17 +612,36 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	values.subList(halfVals, values.size()).clear();
 
         	System.out.println("before update -> keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
-
-        	// Updating sibling links.
+        	
+        	/*// Updating sibling links.
         	if (next != null) {
-        		next.previous = sibling;
+//        		next.previous = sibling;
+//        		sibling.next = next;
+//            	next = sibling;
+        		System.out.println(previous + " " + previous.next);
+//        		previous.next
+//        		previous.next = sibling;
+        		sibling.previous = previous;
         		sibling.next = next;
-            	next = sibling;
+        		previous.next = sibling;
+        		next = sibling;
         	}
         	// If null, sets next to the new sibling and previous to the original node.
         	else {
         		next = sibling;
         		previous = this;
+        	}*/
+        	
+        	// Updating sibling links.
+        	if (/*previous == null || */next == null) {
+        		previous = this;
+        		next = sibling;
+        	}
+        	else {
+        		sibling.next = next;
+        		sibling.previous = previous;
+        		next = sibling;
+        		previous = sibling;
         	}
         	
         	System.out.println("after update -> keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
@@ -628,14 +654,24 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#rangeSearch(Comparable, String)
          */
         List<V> rangeSearch(K key, String comparator) {
-        	// Variable declaration
-        	List<V> valueList = new ArrayList<V>(); // To hold list of filtered values.
+//        	// Variable declaration Bernard Old Code
+//        	List<V> valueList = new LinkedList<V>(); // To hold list of filtered values.
+//            
+////        	System.out.println("previous: " + previous + "\tnext: " + next); // Delete me - for testing only
+////            while (next != null) {
+////            	
+////            	System.out.println("previous: " + previous + "\tnext: " + next);
+////            	next = next.next;
+////            	previous = previous.next;
+////            }
+//        	
+//        	if (comparator.equals("<=")) {
+//        		
+//        	}
+//            
+//        	return valueList;
             
-        	System.out.println("keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
-            
-        	return valueList;
-            
-            // TODO : Complete
+            // TODO : Complete Paul's code
 //            List<V> valueList = new LinkedList<>();
 //            
 //            /*if(key == null) { // Shouldn't have to check these since they're already checked.
@@ -656,7 +692,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 //                //for(V value : list) {  
 //                //}
 //                for(K currentKey : keys) {                      //Traverses keys of a node
-//                    if(comparator.equals("<=")) {               //If comparator is <= check if currnetkey of node are <= key
+//                    if(comparator.equals("<=")) {               //If comparator is <= check if currentKey of node are <= key
 //                        if(currentKey.compareTo(key) <= 0) {
 //                            valueList.add(keyValues.get(keys.indexOf(currentKey)));
 //                        }
@@ -679,6 +715,23 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 //            
 //            
 //			return valueList;
+        	
+        	// Variable declaration Bernard new code
+        	int i = 0; // Loop index;
+        	List<V> valueList = new LinkedList<V>(); // To hold list of filtered values.
+        	LeafNode node = this;
+        	
+        	while (node != null) {
+        		if (comparator.equals("<=")) {
+        			for (i = 0; i < keys.size(); i++) {
+        				if (key.compareTo(keys.get(i)) <= 0) {
+        					
+        				}
+        			}
+        		}
+        	}
+            
+        	return valueList;
 		}
         
         /* Private helper methods */
