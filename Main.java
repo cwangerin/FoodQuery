@@ -316,6 +316,7 @@ public class Main extends Application {
 					}
 					System.out.println();
 					
+					/*
 					if(foodData != null) {
 						filteredByNutrientList = foodData.filterByNutrients(rulesList);
 						
@@ -324,7 +325,7 @@ public class Main extends Application {
 						foodLists.add(filteredByNameList);
 						foodObservableList.setAll(FXCollections.observableList(MealSummary.intersectLists(foodLists)));
 					}
-					
+					*/
 					if(observableRules.isEmpty()) {
 						rulesStage.close();
 					}
@@ -432,8 +433,8 @@ public class Main extends Application {
 			TextField nutrientQueryText = new TextField();
 			nutrientQueryText.setPromptText("<nutrient> <comparator> <value>");
 			nutrientQueryText.setPrefWidth(200);
-			Button submitNutrientQuery = new Button("Apply Nutrient Query");
-			Button clearNutrientQuery = new Button("Clear All Queries");
+			Button submitNutrientQuery = new Button("Add Rule");
+			Button clearNutrientQuery = new Button("Clear All Rules");
 			nutrientQuery.getChildren().addAll(nutrientQueryText, submitNutrientQuery, clearNutrientQuery);
 			
 			submitNutrientQuery.setOnAction(e -> {
@@ -444,6 +445,7 @@ public class Main extends Application {
 				}
 				
 				String textInput = nutrientQueryText.getText();
+				nutrientQueryText.clear();
 				boolean validInput = true;
 				try {
 					String[] ruleArray = textInput.split(" ");
@@ -489,13 +491,14 @@ public class Main extends Application {
 				
 				if(validInput) {
 					rulesList.add(textInput);
-					
+					/*
 					filteredByNutrientList = foodData.filterByNutrients(rulesList);
 					
 					List<List<FoodItem>> foodLists = new ArrayList<List<FoodItem>>();
 					foodLists.add(filteredByNutrientList);
 					foodLists.add(filteredByNameList);
 					foodObservableList.setAll(FXCollections.observableList(MealSummary.intersectLists(foodLists)));
+				*/
 				}
 			});
 			
