@@ -637,11 +637,17 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		previous = this;
         		next = sibling;
         	}
+//        	else {
+//        		sibling.next = next;
+//        		sibling.previous = previous;
+//        		next = sibling;
+//        		previous = sibling;
+//        	}
         	else {
         		sibling.next = next;
         		sibling.previous = previous;
         		next = sibling;
-        		previous = sibling;
+        		previous = null;
         	}
         	
         	System.out.println("after update -> keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
@@ -739,6 +745,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         					valueList.add(node.values.get(i));
         				}
         			}
+        			System.out.println(node);
         			node = node.previous;
         		}
         	}
