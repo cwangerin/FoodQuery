@@ -573,7 +573,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 
 				// Putting children into the newly created InternalNode.
 				newINRoot.keys.add(siblingKey);
-				newINRoot.children.add(this); // FIXME: 'this' used in place of children?
+				newINRoot.children.add(this); // Adding this node to children.
 //            		newINRoot.children.addAll(children);
 				newINRoot.children.add(sibling);
 
@@ -604,28 +604,18 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	sibling.values.addAll(values.subList(halfVals, values.size()));
         	values.subList(halfVals, values.size()).clear();
 
-        	System.out.println("keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
-
-//        	// Updating sibling links.
-//        	if (next != null) {
-//        		sibling.previous = previous;
-//        		sibling.next = next;
-//            	next = sibling;
-//        	}
-//        	else {
-//        		next = sibling;
-//        		previous = sibling.previous;
-//        	}
-        	
-        	if (next == null) {
+        	// Updating sibling links.
+        	if (next != null) {
+        		next.previous = sibling;
+        		sibling.next = next;
+            	next = sibling;
+        	}
+        	// If null, sets next to the new sibling and previous to the original node.
+        	else {
         		next = sibling;
-        	}
-        	else if (next != null && previous == null) {
-        		
+        		previous = this;
         	}
         	
-        	System.out.println("keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
-
             return sibling;
         }
         
