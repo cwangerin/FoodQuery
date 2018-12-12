@@ -3,9 +3,11 @@ package application;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Scanner;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javafx.application.Application;
@@ -59,6 +61,7 @@ public class Main extends Application {
 	Label foodCountLabel;
 	Stage rulesStage;
 	Stage addFoodWindow;
+	String nameQuery;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -91,7 +94,14 @@ public class Main extends Application {
 			
 			delMealItemButton.setOnAction(e -> {
 				ObservableList<FoodItem> delItems = mealListView.getSelectionModel().getSelectedItems();
-				mealObservableList.removeAll(delItems);
+				//mealObservableList.removeAll(delItems);
+				//System.out.println(delItems.size());
+				Object[] foodArray = delItems.toArray();
+				
+				for(Object food : foodArray) {
+					mealObservableList.remove(food);
+				}
+				
 			});
 			
 			Label mealSummaryLabel = new Label("Meal Summary");
@@ -261,6 +271,7 @@ public class Main extends Application {
 			
 			nameFilterButton.setOnAction(e -> {
 				String inputText = nameFilter.getText();
+				nameQuery = inputText;
 				if(foodData != null) {
 					filteredByNameList = foodData.filterByName(inputText);
 					List<List<FoodItem>> listsToIntersect = new ArrayList<List<FoodItem>>();
@@ -277,6 +288,7 @@ public class Main extends Application {
 			});
 			
 			removeNameFilterButton.setOnAction(e -> {
+				nameQuery = null;
 				if(filteredByNameList != null && foodObservableList != null) {
 					filteredByNameList = foodData.getAllFoodItems();
 					foodObservableList.setAll(filteredByNutrientList);
@@ -409,6 +421,10 @@ public class Main extends Application {
 						      else {
 							      foodData.addFoodItem(foodItem);
 							      foodObservableList.add(foodItem);
+							      filteredByNutrientList = foodData.filterByNutrients(rulesList);
+							      if(nameQuery != null) {
+							    	  filteredByNameList = foodData.filterByName(nameQuery);
+							      }
 						      }
 						      
 						      addFoodWindow.close();
@@ -520,6 +536,7 @@ public class Main extends Application {
 			
 			Label foodListLabel = new Label("Food List");
 			foodCountLabel = new Label();
+			foodCountLabel.setText("0");
 			Label foodCountDescription = new Label("Food Count");
 			HBox foodCountListLabels = new HBox();
 			foodListLabel.setStyle("-fx-font: 24 segoeui;");
