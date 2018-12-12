@@ -507,14 +507,6 @@ public class Main extends Application {
 				
 				if(validInput) {
 					rulesList.add(textInput);
-					/*
-					filteredByNutrientList = foodData.filterByNutrients(rulesList);
-					
-					List<List<FoodItem>> foodLists = new ArrayList<List<FoodItem>>();
-					foodLists.add(filteredByNutrientList);
-					foodLists.add(filteredByNameList);
-					foodObservableList.setAll(FXCollections.observableList(MealSummary.intersectLists(foodLists)));
-				*/
 				}
 			});
 			

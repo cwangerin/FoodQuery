@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 
 /**
@@ -32,6 +33,11 @@ public class FoodData implements FoodDataADT<FoodItem> {
         // TODO : Complete
     	foodItemList = new ArrayList<FoodItem>();
     	indexes = new HashMap<String, BPTree<Double, FoodItem>>();
+    	indexes.put("calories", new BPTree<Double,FoodItem>(3));
+    	indexes.put("fat", new BPTree<Double,FoodItem>(3));
+    	indexes.put("carbohydrate", new BPTree<Double,FoodItem>(3));
+    	indexes.put("fiber", new BPTree<Double,FoodItem>(3));
+    	indexes.put("protein", new BPTree<Double,FoodItem>(3));
     }
     
     
@@ -82,6 +88,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
 		    				newItem.addNutrient(protein, proteinCount);
 		    				
 		    				foodItemList.add(newItem);
+		    				addFoodToHashMap(newItem);
 		    				
 		    			}
 		    				
@@ -105,7 +112,11 @@ public class FoodData implements FoodDataADT<FoodItem> {
     }
     
     private void addFoodToHashMap(FoodItem newItem) {
+    	Map<String, Double> nutrientMap = newItem.getNutrients();
     	
+    	for(String s : nutrientMap.keySet()) {
+    		indexes.get(s).insert(nutrientMap.get(s), newItem);;
+    	}
     }
 
     /*
@@ -136,7 +147,7 @@ public class FoodData implements FoodDataADT<FoodItem> {
     public List<FoodItem> filterByNutrients(List<String> rules) {
         // TODO : Complete
     	
-    	List<FoodItem> filteredList = new ArrayList<FoodItem>(foodItemList);
+    	List<List<FoodItem>> filteredList = new ArrayList<List<FoodItem>>();
     	
     	for(String rule : rules) {
     		String[] ruleArray = rule.split(" ");
@@ -144,40 +155,14 @@ public class FoodData implements FoodDataADT<FoodItem> {
     		String comparator = ruleArray[1];
     		Double value = Double.parseDouble(ruleArray[2]);
     		
-    		if(comparator.contentEquals(">=")) {
-    			Iterator<FoodItem> foodIterator = filteredList.iterator();
-    			while(foodIterator.hasNext()) {
-    				FoodItem current = foodIterator.next();
-    				Double foodValue = current.getNutrientValue(nutrient);
-    				if(!(foodValue >= value)) {
-    					foodIterator.remove();
-    				}
-    			}
-    		}
-    		else if(comparator.contentEquals("<=")) {
-    			Iterator<FoodItem> foodIterator = filteredList.iterator();
-    			while(foodIterator.hasNext()) {
-    				FoodItem current = foodIterator.next();
-    				Double foodValue = current.getNutrientValue(nutrient);
-    				if(!(foodValue <= value)) {
-    					foodIterator.remove();
-    				}
-    			}
-    		}
-    		else if(comparator.contentEquals("==")) {
-    			Iterator<FoodItem> foodIterator = filteredList.iterator();
-    			while(foodIterator.hasNext()) {
-    				FoodItem current = foodIterator.next();
-    				Double foodValue = current.getNutrientValue(nutrient);
-    				if(!(foodValue.equals(value))) {
-    					foodIterator.remove();
-    				}
-    			}
-    		}
+    		List<FoodItem> filteredFood = indexes.get(nutrient).rangeSearch(value, comparator);
+			filteredList.add(filteredFood);
     	}
     	
-    	Collections.sort(filteredList, (a, b) -> a.getName().toLowerCase().compareTo(b.getName().toLowerCase()));
-        return filteredList;
+    	List<FoodItem> resultList = MealSummary.intersectLists(filteredList);
+    	
+    	return resultList;
+    			
     }
 
     /*

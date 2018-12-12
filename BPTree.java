@@ -230,18 +230,18 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	
         	Iterator<K> keyIterator = keys.iterator();
         	
-        	int correctIndex = 0;
+        	int correctIndex = -1;
         	K currentKey = null;
         	while(keyIterator.hasNext()) {
+        		correctIndex++;
         		currentKey = keyIterator.next();
         		if(key.compareTo(currentKey) <= 0) {
-        			correctIndex = keys.indexOf(currentKey);
         			break;
         		}
         	}
         	
         	if(key.compareTo(currentKey) > 0) {
-        		correctIndex = keys.indexOf(currentKey) + 1;
+        		correctIndex++;
         	}
         	
         	Node child = children.get(correctIndex);
@@ -252,13 +252,14 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		Node sibling = child.split();
         		K promotedKey = sibling.getFirstLeafKey();
         		
-        		int correctIndex2 = 0;
+        		int correctIndex2 = -1;
         		K currentKey2 = null;
         		Iterator<K> keyIterator2 = keys.iterator();
         		while(keyIterator2.hasNext()) {
+        			correctIndex2++;
         			currentKey2 = keyIterator2.next();
         			if(promotedKey.compareTo(currentKey2) <= 0) {
-        				correctIndex2 = keys.indexOf(currentKey2);
+        				//correctIndex2 = keys.indexOf(currentKey2);
         				break;
         			}
         		}
@@ -315,43 +316,21 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          */
         List<V> rangeSearch(K key, String comparator) {
             if(comparator.contentEquals("<=")) {
-            	Iterator<K> keyIterator = keys.iterator();
-            	int correctIndex = 0;
-            	K currentKey = null;
-            	while(keyIterator.hasNext()) {
-            		currentKey = keyIterator.next();
-            		if(key.compareTo(currentKey) < 0) {
-            			correctIndex = keys.indexOf(currentKey);
-            			break;
-            		}
-            	}
-            	
-            	if(key.compareTo(currentKey) > 0) {
-            		correctIndex = keys.size();
-            	}
-            	
-            	Node correctChild = children.get(correctIndex);
-            	
-            	return correctChild.rangeSearch(key, comparator);
+            	Node lowestChild = children.get(0);
+            	return lowestChild.rangeSearch(key, comparator);
             	
             }
             else if(comparator.contentEquals(">=")) {
-            	Iterator<K> keyIterator = keys.iterator();
-            	int correctIndex = 0;
-            	K currentKey = null;
-            	while(keyIterator.hasNext()) {
-            		currentKey = keyIterator.next();
-            		if(key.compareTo(currentKey) >= 0) {
-            			correctIndex = keys.indexOf(currentKey);
-            			break;
-            		}
+            	Node highestChild = children.get(children.size()-1);
+            	return highestChild.rangeSearch(key, comparator);
+            }
+            else if(comparator.contentEquals("==")) {
+            	int index = Collections.binarySearch(keys, key);
+            	if(index < 0) {
+            		index = -1*(index+1);
             	}
-            	if(key.compareTo(currentKey) > 0) {
-            		correctIndex = keys.size();
-            	}
-            	
-            	Node correctChild = children.get(correctIndex+1);
-            	return correctChild.rangeSearch(key, comparator);
+            	Node child = children.get(index);
+            	return child.rangeSearch(key, comparator);
             }
             
             return null;
@@ -429,18 +408,19 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	}
         	else {
         	
-	        	int correctIndex = 0;
+	        	int correctIndex = -1;
 	        	K currentKey = null;
 	        	while(keyIterator.hasNext()) {
+	        		correctIndex++;
 	        		currentKey = keyIterator.next();
 	        		if(key.compareTo(currentKey) <= 0) {
-	        			correctIndex = keys.indexOf(currentKey);
+	        			//correctIndex = keys.indexOf(currentKey);
 	        			break;
 	        		}
 	        	}
 	        	
 	        	if(key.compareTo(currentKey) > 0) {
-	        		correctIndex = keys.indexOf(currentKey) + 1;
+	        		correctIndex++;
 	        	}
 	        	
 	        	keys.add(correctIndex, key);
@@ -495,37 +475,48 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             // TODO : Complete
         	List<V> masterList = new ArrayList<V>();
         	if(comparator.contentEquals("<=")) {
-        		List<K> firstKeys = new ArrayList<K>(keys);
-        		for(K k : firstKeys) {
-        			if(k.compareTo(key) <= 0) {
-        				masterList.add(values.get(keys.indexOf(k)));
+        		LeafNode curNode = this;
+        		while(curNode != null && key.compareTo(curNode.getFirstLeafKey()) >= 0) {
+        			for(K k : curNode.keys) {
+        				if(k.compareTo(key) <= 0) {
+        					masterList.add(curNode.values.get(curNode.keys.indexOf(k)));
+        				}
         			}
+        			curNode = curNode.next;
+        		}
+        		
+        		return masterList;
+        	}
+        	else if(comparator.contentEquals(">=")) {
+        		LeafNode curNode = this;
+        		while(curNode != null && key.compareTo(curNode.keys.get(curNode.keys.size()-1)) <= 0) {
+        			List<K> reversedKeys = new ArrayList<K>(curNode.keys);
+        			List<V> reversedValues = new ArrayList<V>(curNode.values);
+        			Collections.reverse(reversedKeys);
+        			Collections.reverse(reversedValues);
+        			
+        			for(K k : reversedKeys) {
+        				if(k.compareTo(key) >= 0) {
+        					masterList.add(reversedValues.get(reversedKeys.indexOf(k)));
+        				}
+        			}
+        			
+        			curNode = curNode.previous;
+        			
         		}
         		
         		Collections.reverse(masterList);
-            	
-            	LeafNode temp = previous;
-            	while(temp != null) {
-            		List<V> values = new ArrayList<V>(temp.values);
-            		Collections.reverse(values);
-            		masterList.addAll(values);
-            		temp = temp.previous;
-            	}
-            	
-            	Collections.reverse(masterList);
+        		return masterList;
         	}
-        	else if(comparator.contentEquals(">=")) {
-        		List<K> initialKeys = new ArrayList<K>(keys);
-        		for(K k : initialKeys) {
-        			if(k.compareTo(key) == 0) {
-        				masterList.add(values.get(keys.indexOf(k)));     			}
-        		}
-        		
-        		LeafNode temp = next;
-        		while(temp != null) {
-        			List<V> values = new ArrayList<V>(temp.values);
-        			masterList.addAll(values);
-        			temp = temp.next;
+        	else if(comparator.contentEquals("==")) {
+        		LeafNode temp = this;
+        		while(temp != null && key.compareTo(temp.getFirstLeafKey()) >= 0) {
+	        		for(K k : temp.keys) {
+	        			if(k.compareTo(key) == 0) {
+	        				masterList.add(temp.values.get(temp.keys.indexOf(k)));
+	        			}
+	        		}
+	        		temp = temp.next;
         		}
         	}
         	
@@ -579,16 +570,38 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
       
     	}
     	*/
-    	
+    	/*
     	for(int i = 0; i < 10; i++) {
     		Random randGen = new Random();
     		int randInt = randGen.nextInt(100);
     		bpTree2.insert(randInt, randInt);
     		System.out.println("\n\nTree structure: \n" + bpTree2.toString());
     	}
+    	*/
     	
-    	System.out.println(bpTree2.rangeSearch(65, "<="));
-    	System.out.println(bpTree2.rangeSearch(25,">="));
+    	
+    	for(int i = 0; i < 10; i++) {
+    		bpTree2.insert(i, i);
+    		if(Math.random() > 0.5) {
+    			bpTree2.insert(i,i);
+    		}
+    		
+    		System.out.println("\n\nTree structure: \n" + bpTree2.toString());
+    	}
+    	
+    	
+    	bpTree2.insert(2,2);
+    	bpTree2.insert(2, 2);
+    	bpTree2.insert(2,2);
+    	bpTree2.insert(1, 1);
+    	bpTree2.insert(3, 3);
+    	bpTree2.insert(0, 0);
+    	bpTree2.insert(0, 0);
+    	System.out.println("\n\nTree structure: \n" + bpTree2.toString());
+    	
+    	System.out.println(bpTree2.rangeSearch(16, "<="));
+    	System.out.println(bpTree2.rangeSearch(1,">="));
+    	System.out.println(bpTree2.rangeSearch(2, "=="));
     }
 
 } // End of class BPTree
