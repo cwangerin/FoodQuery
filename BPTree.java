@@ -228,20 +228,9 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         void insert(K key, V value) {
             // TODO : Complete
         	
-        	Iterator<K> keyIterator = keys.iterator();
-        	
-        	int correctIndex = -1;
-        	K currentKey = null;
-        	while(keyIterator.hasNext()) {
-        		correctIndex++;
-        		currentKey = keyIterator.next();
-        		if(key.compareTo(currentKey) <= 0) {
-        			break;
-        		}
-        	}
-        	
-        	if(key.compareTo(currentKey) > 0) {
-        		correctIndex++;
+        	int correctIndex = Collections.binarySearch(keys, key);
+        	if(correctIndex < 0) {
+        		correctIndex = (-1)*(correctIndex+1);
         	}
         	
         	Node child = children.get(correctIndex);
@@ -252,28 +241,13 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		Node sibling = child.split();
         		K promotedKey = sibling.getFirstLeafKey();
         		
-        		int correctIndex2 = -1;
-        		K currentKey2 = null;
-        		Iterator<K> keyIterator2 = keys.iterator();
-        		while(keyIterator2.hasNext()) {
-        			correctIndex2++;
-        			currentKey2 = keyIterator2.next();
-        			if(promotedKey.compareTo(currentKey2) <= 0) {
-        				//correctIndex2 = keys.indexOf(currentKey2);
-        				break;
-        			}
+        		int correctIndex2 = Collections.binarySearch(keys, promotedKey);
+        		if(correctIndex2 < 0) {
+        			correctIndex2 = (-1)*(correctIndex2 +1);
         		}
         		
-        		if(promotedKey.compareTo(currentKey2) > 0) {
-        			keys.add(promotedKey);
-        			children.add(keys.size(), sibling);
-        		}
-        		else {
-        			keys.add(correctIndex2, promotedKey);
-        			children.add(correctIndex2 + 1, sibling);
-        		}
-        		
-        		
+        		keys.add(correctIndex2, promotedKey);
+        		children.add(correctIndex2 +1, sibling);
         		
         	}
         	
@@ -407,22 +381,11 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		values.add(value);
         	}
         	else {
-        	
-	        	int correctIndex = -1;
-	        	K currentKey = null;
-	        	while(keyIterator.hasNext()) {
-	        		correctIndex++;
-	        		currentKey = keyIterator.next();
-	        		if(key.compareTo(currentKey) <= 0) {
-	        			//correctIndex = keys.indexOf(currentKey);
-	        			break;
-	        		}
-	        	}
-	        	
-	        	if(key.compareTo(currentKey) > 0) {
-	        		correctIndex++;
-	        	}
-	        	
+        		
+        		int correctIndex = Collections.binarySearch(keys, key);
+        		if(correctIndex < 0) {
+        			correctIndex = -1*(correctIndex+1);
+        		}
 	        	keys.add(correctIndex, key);
 	        	values.add(correctIndex, value);
         	}
@@ -579,11 +542,12 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     	}
     	*/
     	
-    	
-    	for(int i = 0; i < 10; i++) {
-    		bpTree2.insert(i, i);
+    	Random randGen = new Random();
+    	for(int i = 0; i < 100; i++) {
+    		int randomInt = randGen.nextInt(100);
+    		bpTree2.insert(randomInt, randomInt);
     		if(Math.random() > 0.5) {
-    			bpTree2.insert(i,i);
+    			bpTree2.insert(randomInt, randomInt);
     		}
     		
     		System.out.println("\n\nTree structure: \n" + bpTree2.toString());
