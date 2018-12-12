@@ -618,30 +618,19 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	
             return sibling;
         }
-        
        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         /**
          * (non-Javadoc)
          * @see BPTree.Node#rangeSearch(Comparable, String)
          */
         List<V> rangeSearch(K key, String comparator) {
+        	// Variable declaration
+        	List<V> valueList = new ArrayList<V>(); // To hold list of filtered values.
+            
+//        	System.out.println("keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
+            return valueList;
+            
+            
             // TODO : Complete
 //            List<V> valueList = new LinkedList<>();
 //            
@@ -686,35 +675,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
 //            
 //            
 //			return valueList;
-            
-            // Variable declaration
-        	List<V> valueList = new ArrayList<V>(); // To hold list of filtered values.
-            
-//        	System.out.println("keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
-            return valueList;
 		}
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         
         /* Private helper methods */
         
