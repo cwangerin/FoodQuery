@@ -19,6 +19,8 @@ import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.HBox;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -39,7 +41,7 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
 public class Main extends Application {
-	ObservableList<FoodItem> foodObservableList;
+	ObservableList<FoodItem> foodObservableList; 
 	ListView<FoodItem> foodListView;
 	
 	List<FoodItem> filteredByNutrientList;
@@ -55,6 +57,8 @@ public class Main extends Application {
 	MenuBar dropMenu;
 	VBox vBoxRight;
 	Label foodCountLabel;
+	Stage rulesStage;
+	Stage addFoodWindow;
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -165,9 +169,17 @@ public class Main extends Application {
 			menuFile.getItems().add(menuFoodList);
 			menuFile.getItems().add(menuSaveList);
 			menuHelp.getItems().add(menuHelpItem);
+			FileChooser.ExtensionFilter extFilter = new FileChooser.ExtensionFilter("CSV File", "*.csv");
+			FileChooser.ExtensionFilter extFilter2 = new FileChooser.ExtensionFilter("TXT File", "*.txt");
+			fileChooser.getExtensionFilters().addAll(extFilter,extFilter2);
 			
 			menuSaveList.setOnAction(e ->  {
 				File saveFile = fileChooser.showSaveDialog(primaryStage);
+				
+				if(saveFile == null) {
+					return;
+				}
+				
 				if(foodObservableList != null) {
 					FoodData savedData = new FoodData();
 					
@@ -177,19 +189,25 @@ public class Main extends Application {
 					
 					savedData.saveFoodItems(saveFile.getAbsolutePath());
 				}
+				else {
+					displayErrorMessage("There is no food to save!");
+				}
 			});
 			
 			menuFoodList.setOnAction(e -> {
 			    File selectedFile = fileChooser.showOpenDialog(primaryStage);
-				String filePath = selectedFile.getAbsolutePath();
-				
-				foodData = new FoodData();
-				foodData.loadFoodItems(filePath);
-				foodObservableList = FXCollections.observableArrayList(foodData.getAllFoodItems());
-				filteredByNutrientList = foodData.getAllFoodItems();
-				filteredByNameList = foodData.getAllFoodItems();
-				foodListView.setItems(foodObservableList.sorted());
-				foodCountLabel.textProperty().bind((Bindings.size(foodObservableList).asString()));
+				if(selectedFile != null) {
+				    String filePath = selectedFile.getAbsolutePath();
+					
+					foodData = new FoodData();
+					foodData.loadFoodItems(filePath);
+					foodObservableList = FXCollections.observableArrayList(foodData.getAllFoodItems());
+					filteredByNutrientList = foodData.getAllFoodItems();
+					filteredByNameList = foodData.getAllFoodItems();
+					foodListView.setItems(foodObservableList.sorted());
+					foodCountLabel.textProperty().bind((Bindings.size(foodObservableList).asString()));
+					rulesList.clear();
+				}
 			});
 			
 			menuHelpItem.setOnAction(e -> {
@@ -221,32 +239,48 @@ public class Main extends Application {
 			Button addFood = new Button("Add New Food");
 			Button sendToMeal = new Button("Send to Meal");
 			Button showRules = new Button("Show Rules");
-			Button deleteButton = new Button("Delete");
+			Button applyAllQueries = new Button("Apply All Rules");
 			Button nameFilterButton = new Button("Apply Name Filter");
 			Button removeNameFilterButton = new Button("Remove Name Filter");
 			
-			addNewFoodSendToMeal.getChildren().addAll(addFood, sendToMeal,showRules);
+			addNewFoodSendToMeal.getChildren().addAll(addFood, sendToMeal,showRules,applyAllQueries);
+			
+			applyAllQueries.setOnAction(e -> {
+				if(foodData != null) {
+					List<List<FoodItem>> listsToIntersect = new ArrayList<List<FoodItem>>();
+					filteredByNutrientList = foodData.filterByNutrients(rulesList);
+					if(filteredByNameList != null && filteredByNutrientList != null) {
+						listsToIntersect.add(filteredByNameList);
+						listsToIntersect.add(filteredByNutrientList);
+						List<FoodItem> intersection = MealSummary.intersectLists(listsToIntersect);
+						
+						foodObservableList.setAll(intersection);
+					}
+				}
+			});
 			
 			nameFilterButton.setOnAction(e -> {
 				String inputText = nameFilter.getText();
-				filteredByNameList = foodData.filterByName(inputText);
-				List<List<FoodItem>> listsToIntersect = new ArrayList<List<FoodItem>>();
-				listsToIntersect.add(filteredByNameList);
-				listsToIntersect.add(filteredByNutrientList);
-				List<FoodItem> intersection = MealSummary.intersectLists(listsToIntersect);
-				
-				foodObservableList.setAll(intersection);
-				
+				if(foodData != null) {
+					filteredByNameList = foodData.filterByName(inputText);
+					List<List<FoodItem>> listsToIntersect = new ArrayList<List<FoodItem>>();
+					listsToIntersect.add(filteredByNameList);
+					listsToIntersect.add(filteredByNutrientList);
+					List<FoodItem> intersection = MealSummary.intersectLists(listsToIntersect);
+					
+					foodObservableList.setAll(intersection);
+				}
+				else {
+					displayErrorMessage("There is no food to filter!");
+				}
 				
 			});
 			
 			removeNameFilterButton.setOnAction(e -> {
-				filteredByNameList = foodData.getAllFoodItems();
-				foodObservableList.setAll(filteredByNutrientList);
-			});
-			
-			deleteButton.setOnAction((ActionEvent e) -> {
-				ObservableList<FoodItem> removeItems = foodListView.getSelectionModel().getSelectedItems();
+				if(filteredByNameList != null && foodObservableList != null) {
+					filteredByNameList = foodData.getAllFoodItems();
+					foodObservableList.setAll(filteredByNutrientList);
+				}
 			});
 			
 			sendToMeal.setOnAction((ActionEvent e) -> {
@@ -256,27 +290,64 @@ public class Main extends Application {
 				
 			});
 			showRules.setOnAction((ActionEvent e) ->{
-				Stage ruleStage = new Stage();
+				if(rulesStage != null) {
+					rulesStage.close();
+				}
+				rulesStage = new Stage();
 				BorderPane rulePane = new BorderPane();
-				Label ruleLabel = new Label();
-				String rules = rulesList.stream().collect(Collectors.joining("\n"));
-				ruleLabel.setWrapText(true);
-				ruleLabel.setText(rules);
-				rulePane.setTop(ruleLabel);
-				Scene ruleScene = new Scene(rulePane, 350, 350);
-				ruleStage.setTitle("Rules");
-				ruleStage.setScene(ruleScene);
-				ruleStage.show();
+				VBox vbox = new VBox();
+				ObservableList<String> observableRules = FXCollections.observableList(rulesList);
+				ListView<String> rulesView = new ListView<String>(observableRules);
+				rulesView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+				rulePane.setTop(vbox);
+				Button deleteRule = new Button("Delete Rule");
+				vbox.getChildren().addAll(rulesView,deleteRule);
+				
+				deleteRule.setOnAction(f -> {
+					for(String rule : rulesList) {
+						System.out.print(rule);
+					}
+					System.out.println();
+					List<String> selectedRules = rulesView.getSelectionModel().getSelectedItems();
+					observableRules.removeAll(selectedRules);
+					
+					for(String rule : rulesList) {
+						System.out.print(rule);
+					}
+					System.out.println();
+					
+					if(foodData != null) {
+						filteredByNutrientList = foodData.filterByNutrients(rulesList);
+						
+						List<List<FoodItem>> foodLists = new ArrayList<List<FoodItem>>();
+						foodLists.add(filteredByNutrientList);
+						foodLists.add(filteredByNameList);
+						foodObservableList.setAll(FXCollections.observableList(MealSummary.intersectLists(foodLists)));
+					}
+					
+					if(observableRules.isEmpty()) {
+						rulesStage.close();
+					}
+				});
+				
+				Scene ruleScene = new Scene(rulePane, 350, 700);
+				rulesStage.setTitle("Rules");
+				rulesStage.setScene(ruleScene);
+				rulesStage.show();
 			});
 			
 			HBox listViewAddFoodHBox = new HBox();
 			listViewAddFoodHBox.getChildren().addAll(foodListView, addNewFoodSendToMeal);
 			hbox2.getChildren().addAll(nameFilter,nameFilterButton, removeNameFilterButton);
 			addFood.setOnAction((ActionEvent e) -> {
-				Stage addFoodWindow = new Stage();
+				if(addFoodWindow != null) {
+					addFoodWindow.close();
+				}
+				addFoodWindow = new Stage();
 				BorderPane bp2 = new BorderPane();
 				VBox vbox2 = new VBox();
 				TextField foodName = new TextField();
+				TextField foodID = new TextField();
 				TextField calorieCount = new TextField();
 				TextField fatGrams = new TextField();
 				TextField carbGrams = new TextField();
@@ -284,6 +355,7 @@ public class Main extends Application {
 				TextField proteinGrams = new TextField();
 				Label title = new Label();
 				title.setText("Add food item with its nutrients");
+				foodID.setPromptText("Enter a unique ID for this food");
 				foodName.setPromptText("food name");
 				calorieCount.setPromptText("calorie count");
 				fatGrams.setPromptText("fat grams");
@@ -296,30 +368,57 @@ public class Main extends Application {
 				carbGrams.setFocusTraversable(false);
 				fiberGrams.setFocusTraversable(false);
 				proteinGrams.setFocusTraversable(false);
+			    foodID.setFocusTraversable(false);
 				Button submit = new Button("submit");
 				submit.setOnAction(r -> {
 					 try {
-					      FoodItem foodItem = new FoodItem(foodName.getText(),foodName.getText());
-					      foodItem.addNutrient("calories", Double.parseDouble(calorieCount.getText()));
-					      foodItem.addNutrient("fat", Double.parseDouble(fatGrams.getText()));
-					      foodItem.addNutrient("carbohydrate", Double.parseDouble(carbGrams.getText()));
-					      foodItem.addNutrient("fiber", Double.parseDouble(fiberGrams.getText()));
-					      foodItem.addNutrient("protein", Double.parseDouble(proteinGrams.getText()));
-					      foodData.addFoodItem(foodItem);
-					      if(foodObservableList == null) {
-					    	  foodObservableList = FXCollections.observableArrayList();
-					    	  foodCountLabel.textProperty().bind((Bindings.size(foodObservableList).asString()));
+					      FoodItem foodItem = new FoodItem(foodID.getText(),foodName.getText());
+					      System.out.println(foodItem.getID());
+					      Double calories = Double.parseDouble(calorieCount.getText());
+					      Double fat = Double.parseDouble(fatGrams.getText());
+					      Double carbohydrate = Double.parseDouble(carbGrams.getText());
+					      Double fiber = Double.parseDouble(fiberGrams.getText());
+					      Double protein = Double.parseDouble(proteinGrams.getText());
+					      if(calories < 0 || fat < 0 || carbohydrate < 0 || fiber < 0 || protein < 0) {
+					    	  displayErrorMessage("Nutrients cannot have negative nutrition values");
 					      }
-					      foodObservableList.add(foodItem);
+					      else {
+						      foodItem.addNutrient("calories", calories);
+						      foodItem.addNutrient("fat", fat);
+						      foodItem.addNutrient("carbohydrate", carbohydrate);
+						      foodItem.addNutrient("fiber", fiber);
+						      foodItem.addNutrient("protein", protein);
+					      
+						      if(foodData == null) {
+						    	  foodData = new FoodData();
+						    	  							
+						      }
+						      
+						      if(foodObservableList == null) {
+						    	  foodObservableList = FXCollections.observableArrayList();
+						    	  foodCountLabel.textProperty().bind((Bindings.size(foodObservableList).asString()));
+						    	  filteredByNutrientList = new ArrayList<FoodItem>();
+								  filteredByNameList = new ArrayList<FoodItem>();
+								  filteredByNutrientList.add(foodItem);
+								  filteredByNameList.add(foodItem);
+								  foodData.addFoodItem(foodItem);
+							      foodObservableList.add(foodItem);
+								  foodListView.setItems(foodObservableList.sorted());
+						      }
+						      else {
+							      foodData.addFoodItem(foodItem);
+							      foodObservableList.add(foodItem);
+						      }
+						      
+						      addFoodWindow.close();
+					      }
 					      
 					     }catch(NumberFormatException j){
-					      System.out.println("Empty Nutrient Value");
+					    	 displayErrorMessage("You must enter numeric nutrition values");
 					     }
 					 
-					
-					 addFoodWindow.close();
 				});
-				vbox2.getChildren().addAll(title,foodName,calorieCount,fatGrams,
+				vbox2.getChildren().addAll(title,foodID, foodName,calorieCount,fatGrams,
 						carbGrams,fiberGrams,proteinGrams,submit);
 				bp2.setCenter(vbox2);
 				Scene popupScene = new Scene(bp2, 750, 450);
@@ -334,30 +433,84 @@ public class Main extends Application {
 			nutrientQueryText.setPromptText("<nutrient> <comparator> <value>");
 			nutrientQueryText.setPrefWidth(200);
 			Button submitNutrientQuery = new Button("Apply Nutrient Query");
-			Button clearNutrientQuery = new Button("Clear Nutrient Queries");
+			Button clearNutrientQuery = new Button("Clear All Queries");
 			nutrientQuery.getChildren().addAll(nutrientQueryText, submitNutrientQuery, clearNutrientQuery);
 			
 			submitNutrientQuery.setOnAction(e -> {
+				
+				if(foodData == null) {
+					displayErrorMessage("There is no food to filter!");
+					return;
+				}
+				
 				String textInput = nutrientQueryText.getText();
-				rulesList.add(textInput);
+				boolean validInput = true;
+				try {
+					String[] ruleArray = textInput.split(" ");
+					if(ruleArray.length == 3) {
+			    		String nutrient = ruleArray[0];
+			    		String comparator = ruleArray[1];
+			    		Double value = Double.parseDouble(ruleArray[2]);
+			    		
+			    		if(!(comparator.contentEquals("<=") || comparator.contentEquals("==") ||
+			    				comparator.contentEquals(">="))) {
+			    			displayErrorMessage("Enter a valid comparator");
+			    			validInput = false;
+			    		}
+			    		else {
+			    		
+				    		String[] validOptions = {"calories", "fat", "carbohydrate", "fiber", "protein"};
+				    		
+				    		boolean validString = false;
+				    		for(String s : validOptions) {
+				    			if(nutrient.equalsIgnoreCase(s)) {
+				    				validString = true;
+				    				break;
+				    			}
+				    		}
+				    		
+				    		if(!validString) {
+				    			validInput = false;
+				    			displayErrorMessage("You must enter a valid nutrient name");
+				    		}
+			    		
+			    		}
+					}
+					else {
+						validInput = false;
+						displayErrorMessage("Incorrect number of arguments. See instructions.");
+					}
+					
+					
+				}catch(NumberFormatException f) {
+					validInput = false;
+					displayErrorMessage("You must enter a number for the nutrient value");
+				}
 				
-				filteredByNutrientList = foodData.filterByNutrients(rulesList);
-				
-				List<List<FoodItem>> foodLists = new ArrayList<List<FoodItem>>();
-				foodLists.add(filteredByNutrientList);
-				foodLists.add(filteredByNameList);
-				foodObservableList.setAll(FXCollections.observableList(MealSummary.intersectLists(foodLists)));
-				
+				if(validInput) {
+					rulesList.add(textInput);
+					
+					filteredByNutrientList = foodData.filterByNutrients(rulesList);
+					
+					List<List<FoodItem>> foodLists = new ArrayList<List<FoodItem>>();
+					foodLists.add(filteredByNutrientList);
+					foodLists.add(filteredByNameList);
+					foodObservableList.setAll(FXCollections.observableList(MealSummary.intersectLists(foodLists)));
+				}
 			});
 			
 			clearNutrientQuery.setOnAction(e -> {
-				rulesList.clear();
-				filteredByNutrientList = foodData.getAllFoodItems();
-				foodObservableList.setAll(filteredByNameList);
-				for(FoodItem food : filteredByNameList) {
-					System.out.println(food.getID());
+				if(rulesStage != null) {
+					rulesStage.close();
 				}
-				
+				rulesList.clear();
+				if(foodObservableList != null && filteredByNutrientList != null) {
+					filteredByNutrientList = foodData.getAllFoodItems();
+					foodObservableList.setAll(filteredByNameList);
+					for(FoodItem food : filteredByNameList) {
+						System.out.println(food.getID());
+					}
+				}
 			});
 			
 			
@@ -429,6 +582,17 @@ public class Main extends Application {
 			e.printStackTrace();
 		}
 	}
+	
+	private void displayErrorMessage(String errorText) {
+		
+		Alert errorAlert = new Alert(AlertType.ERROR);
+		
+		errorAlert.setHeaderText("Error");
+		errorAlert.setContentText(errorText);
+		errorAlert.showAndWait();
+		
+	}
+	
 	public static void main(String[] args) {
 		launch(args);
 	}
