@@ -604,6 +604,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	sibling.values.addAll(values.subList(halfVals, values.size()));
         	values.subList(halfVals, values.size()).clear();
 
+        	System.out.println("before update -> keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
+
         	// Updating sibling links.
         	if (next != null) {
         		next.previous = sibling;
@@ -616,6 +618,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		previous = this;
         	}
         	
+        	System.out.println("after update -> keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
+
             return sibling;
         }
        
@@ -627,9 +631,9 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	// Variable declaration
         	List<V> valueList = new ArrayList<V>(); // To hold list of filtered values.
             
-//        	System.out.println("keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
-            return valueList;
+        	System.out.println("keys: " + keys + "\tvalues: " + values + "\tprev: " + previous + "\tnext: " + next); // Delete me - for testing only
             
+        	return valueList;
             
             // TODO : Complete
 //            List<V> valueList = new LinkedList<>();
@@ -777,17 +781,17 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     	
 
     	BPTree<Integer, Integer> bpTree = new BPTree<>(3);
-    	bpTree.insert(0, 1);System.out.println("Tree structure: (Insert 0)\n" + bpTree.toString());
-    	bpTree.insert(5, 6);System.out.println("Tree structure: (Insert 5)\n" + bpTree.toString());
-    	bpTree.insert(10, 11);System.out.println("Tree structure: (Insert 10)\n" + bpTree.toString());
-    	bpTree.insert(3, 4);System.out.println("Tree structure: (Insert 3)\n" + bpTree.toString());
-    	bpTree.insert(8, 9);System.out.println("Tree structure: (Insert 8)\n" + bpTree.toString());
-    	bpTree.insert(6, 7);System.out.println("Tree structure: (Insert 6)\n" + bpTree.toString());
-    	bpTree.insert(9, 10);System.out.println("Tree structure: (Insert 9)\n" + bpTree.toString());
-    	bpTree.insert(1, 2);System.out.println("Tree structure: (Insert 1)\n" + bpTree.toString());
-    	bpTree.insert(2, 3);System.out.println("Tree structure: (Insert 2)\n" + bpTree.toString());
-    	bpTree.insert(1, 3);System.out.println("Tree structure: (Insert 2)\n" + bpTree.toString());
-    	bpTree.insert(7, 8);System.out.println("Tree structure: (Insert 7)\n" + bpTree.toString());
+    	bpTree.insert(0, 0);System.out.println("Tree structure: (Insert 0)\n" + bpTree.toString());
+    	bpTree.insert(5, 5);System.out.println("Tree structure: (Insert 5)\n" + bpTree.toString());
+    	bpTree.insert(10, 10);System.out.println("Tree structure: (Insert 10)\n" + bpTree.toString());
+    	bpTree.insert(3, 3);System.out.println("Tree structure: (Insert 3)\n" + bpTree.toString());
+    	bpTree.insert(8, 8);System.out.println("Tree structure: (Insert 8)\n" + bpTree.toString());
+    	bpTree.insert(6, 6);System.out.println("Tree structure: (Insert 6)\n" + bpTree.toString());
+    	bpTree.insert(9, 9);System.out.println("Tree structure: (Insert 9)\n" + bpTree.toString());
+    	bpTree.insert(1, 1);System.out.println("Tree structure: (Insert 1)\n" + bpTree.toString());
+    	bpTree.insert(2, 2);System.out.println("Tree structure: (Insert 2)\n" + bpTree.toString());
+    	bpTree.insert(1, 1);System.out.println("Tree structure: (Insert 2)\n" + bpTree.toString());
+    	bpTree.insert(7, 7);System.out.println("Tree structure: (Insert 7)\n" + bpTree.toString());
     	List<Integer> filteredValues = bpTree.rangeSearch(5, ">=");
     	System.out.println("Filtered values: " + filteredValues.toString());
     	
