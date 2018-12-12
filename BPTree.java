@@ -335,6 +335,24 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             	return correctChild.rangeSearch(key, comparator);
             	
             }
+            else if(comparator.contentEquals(">=")) {
+            	Iterator<K> keyIterator = keys.iterator();
+            	int correctIndex = 0;
+            	K currentKey = null;
+            	while(keyIterator.hasNext()) {
+            		currentKey = keyIterator.next();
+            		if(key.compareTo(currentKey) >= 0) {
+            			correctIndex = keys.indexOf(currentKey);
+            			break;
+            		}
+            	}
+            	if(key.compareTo(currentKey) > 0) {
+            		correctIndex = keys.size();
+            	}
+            	
+            	Node correctChild = children.get(correctIndex+1);
+            	return correctChild.rangeSearch(key, comparator);
+            }
             
             return null;
         }
@@ -483,19 +501,35 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         				masterList.add(values.get(keys.indexOf(k)));
         			}
         		}
+        		
+        		Collections.reverse(masterList);
+            	
+            	LeafNode temp = previous;
+            	while(temp != null) {
+            		List<V> values = new ArrayList<V>(temp.values);
+            		Collections.reverse(values);
+            		masterList.addAll(values);
+            		temp = temp.previous;
+            	}
+            	
+            	Collections.reverse(masterList);
+        	}
+        	else if(comparator.contentEquals(">=")) {
+        		List<K> initialKeys = new ArrayList<K>(keys);
+        		for(K k : initialKeys) {
+        			if(k.compareTo(key) == 0) {
+        				masterList.add(values.get(keys.indexOf(k)));     			}
+        		}
+        		
+        		LeafNode temp = next;
+        		while(temp != null) {
+        			List<V> values = new ArrayList<V>(temp.values);
+        			masterList.addAll(values);
+        			temp = temp.next;
+        		}
         	}
         	
-        	Collections.reverse(masterList);
         	
-        	LeafNode temp = previous;
-        	while(temp != null) {
-        		List<V> values = new ArrayList<V>(temp.values);
-        		Collections.reverse(values);
-        		masterList.addAll(values);
-        		temp = temp.previous;
-        	}
-        	
-        	Collections.reverse(masterList);
             return masterList;
         }
         
@@ -554,6 +588,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     	}
     	
     	System.out.println(bpTree2.rangeSearch(65, "<="));
+    	System.out.println(bpTree2.rangeSearch(25,">="));
     }
 
 } // End of class BPTree
