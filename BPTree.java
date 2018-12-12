@@ -720,14 +720,26 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         	int i = 0; // Loop index;
         	List<V> valueList = new LinkedList<V>(); // To hold list of filtered values.
         	LeafNode node = this;
-        	
+
         	while (node != null) {
-        		if (comparator.equals("<=")) {
-        			for (i = 0; i < keys.size(); i++) {
-        				if (key.compareTo(keys.get(i)) <= 0) {
-        					
+        		if (comparator.equals(">=")) {
+        			for (i = 0; i < node.keys.size(); i++) {
+        				if (key.compareTo(node.keys.get(i)) <= 0) {
+        					valueList.add(node.values.get(i));
         				}
         			}
+        			node = node.next;
+        		}
+        		else if (comparator.equals("==")) {
+        			node = node.next;
+        		}
+        		else {
+        			for (i = 0; i < node.keys.size(); i++) {
+        				if (key.compareTo(node.keys.get(i)) >= 0) {
+        					valueList.add(node.values.get(i));
+        				}
+        			}
+        			node = node.previous;
         		}
         	}
             
@@ -845,7 +857,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     	bpTree.insert(2, 2);System.out.println("Tree structure: (Insert 2)\n" + bpTree.toString());
     	bpTree.insert(1, 1);System.out.println("Tree structure: (Insert 2)\n" + bpTree.toString());
     	bpTree.insert(7, 7);System.out.println("Tree structure: (Insert 7)\n" + bpTree.toString());
-    	List<Integer> filteredValues = bpTree.rangeSearch(5, ">=");
+    	List<Integer> filteredValues = bpTree.rangeSearch(5, "<=");
     	System.out.println("Filtered values: " + filteredValues.toString());
     	
 //    	BPTree<Integer, Integer> bpTree = new BPTree<>(3);
