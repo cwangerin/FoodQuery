@@ -28,9 +28,10 @@ public class FoodData implements FoodDataADT<FoodItem> {
     
     /**
      * Public constructor
+     * Initialize the foodItemList as well as the hashMap of strings
+     * and BP Trees
      */
     public FoodData() {
-        // TODO : Complete
     	foodItemList = new ArrayList<FoodItem>();
     	indexes = new HashMap<String, BPTree<Double, FoodItem>>();
     	indexes.put("calories", new BPTree<Double,FoodItem>(3));
@@ -47,12 +48,10 @@ public class FoodData implements FoodDataADT<FoodItem> {
      */
     @Override
     public void loadFoodItems(String filePath) {
-        // TODO : Complete
     	
     	File inputFile = new File(filePath);
     	try {
 	    	Scanner in = new Scanner(inputFile);
-	    	int skipCount = 0;
 	    	
 	    	while(in.hasNextLine()) {
 	    		String line = in.nextLine();
@@ -75,7 +74,6 @@ public class FoodData implements FoodDataADT<FoodItem> {
 	    			
 		    			if(!(calories.equalsIgnoreCase("calories") && fat.equalsIgnoreCase("fat") && carbohydrates.equalsIgnoreCase("carbohydrate")
 		    					&& fiber.equalsIgnoreCase("fiber") && protein.equalsIgnoreCase("protein"))) {
-		    				++skipCount;
 		    			}
 		    			else {
 		    				//construct new foodItem
@@ -87,33 +85,37 @@ public class FoodData implements FoodDataADT<FoodItem> {
 		    				newItem.addNutrient(fiber, fiberCount);
 		    				newItem.addNutrient(protein, proteinCount);
 		    				
-		    				foodItemList.add(newItem);
-		    				addFoodToHashMap(newItem);
+		    				addFoodItem(newItem);
 		    				
 		    			}
 		    				
 		    			
 	    			}catch(NumberFormatException e) {
-	    				++skipCount;
+	    				System.err.println(e.getMessage());
 	    			}
-	    		}
-	    		else {
-	    			++skipCount;
 	    		}
 	    	}
 	    	in.close();
-	    	//System.out.println(skipCount);
     	
     	}catch(Exception e) {
     		System.err.println(e.getMessage());
     	}
     	
+    	//maintain sort
     	Collections.sort(foodItemList, (a,b) -> a.getName().toLowerCase().compareTo(b.getName().toLowerCase()));
     }
     
+    /**
+     * Adds the foodItem to each of the BPTrees associated with each
+     * nutrient value in the hashMap
+     * @param newItem
+     */
     private void addFoodToHashMap(FoodItem newItem) {
+    	//Get the map of strings representing nutrients
     	Map<String, Double> nutrientMap = newItem.getNutrients();
     	
+    	//for each nutrient string, we want to insert the item
+    	//into the BPTree
     	for(String s : nutrientMap.keySet()) {
     		indexes.get(s).insert(nutrientMap.get(s), newItem);;
     	}
@@ -125,16 +127,18 @@ public class FoodData implements FoodDataADT<FoodItem> {
      */
     @Override
     public List<FoodItem> filterByName(String substring) {
-        // TODO : Complete
     	
+    	//We will store the filtered food here
     	List<FoodItem> filteredList = new ArrayList<FoodItem>();
     	
+    	//for each foodItem, see if it matches the substring in a case-insensitive manner
     	for(FoodItem food : foodItemList) {
     		if(food.getName().toLowerCase().contains(substring.toLowerCase())) {
     			filteredList.add(food);
     		}
     	}
     	
+    	//return the list in sorted form
         Collections.sort(filteredList, (a, b) -> a.getName().compareTo(b.getName()));
         return filteredList;
     }
@@ -145,21 +149,24 @@ public class FoodData implements FoodDataADT<FoodItem> {
      */
     @Override
     public List<FoodItem> filterByNutrients(List<String> rules) {
-        // TODO : Complete
     	
     	List<List<FoodItem>> filteredList = new ArrayList<List<FoodItem>>();
-    	
+    	//A list of the lists that will need to be interesected
     	for(String rule : rules) {
     		String[] ruleArray = rule.split(" ");
     		String nutrient = ruleArray[0];
     		String comparator = ruleArray[1];
     		Double value = Double.parseDouble(ruleArray[2]);
     		
+    		//apply the range search on each query
     		List<FoodItem> filteredFood = indexes.get(nutrient).rangeSearch(value, comparator);
-			filteredList.add(filteredFood);
+			//add the result of the query to our overall list
+    		//we want to intersect
+    		filteredList.add(filteredFood);
     	}
     	
-    	List<FoodItem> resultList = MealSummary.intersectLists(filteredList);
+    	//call the static helper class for intersecting lists
+    	List<FoodItem> resultList = FoodListOperations.intersectLists(filteredList);
     	
     	return resultList;
     			
@@ -171,9 +178,8 @@ public class FoodData implements FoodDataADT<FoodItem> {
      */
     @Override
     public void addFoodItem(FoodItem foodItem) {
-        // TODO : Complete
     	foodItemList.add(foodItem);
-    	// do stuff with hashmap
+    	addFoodToHashMap(foodItem);
     }
 
     /*
@@ -182,15 +188,21 @@ public class FoodData implements FoodDataADT<FoodItem> {
      */
     @Override
     public List<FoodItem> getAllFoodItems() {
-        // TODO : Complete
         return foodItemList;
     }
     
+    /**
+     * Saves the food present in this FoodData instance to the
+     * specified file in a comma-separated manner
+     * @param filename
+     */
     public void saveFoodItems(String filename) {
     	File saveFile = new File(filename);
     	
+    	//start with sorted food items
     	Collections.sort(foodItemList, (a,b) -> a.getName().toLowerCase().compareTo(b.getName().toLowerCase()));
     	
+    	//save to the file
     	try {
     		FileWriter f = new FileWriter(saveFile);
     		BufferedWriter b = new BufferedWriter(f);

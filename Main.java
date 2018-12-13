@@ -42,26 +42,33 @@ import javafx.scene.paint.Color;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
 
+/**
+ * Main class that runs the FoodQuery GUI program
+ * 
+ *
+ */
 public class Main extends Application {
-	ObservableList<FoodItem> foodObservableList; 
-	ListView<FoodItem> foodListView;
+	ObservableList<FoodItem> foodObservableList; //observable list for food
+	ListView<FoodItem> foodListView; //list view for food
 	
-	List<FoodItem> filteredByNutrientList;
-	List<FoodItem> filteredByNameList;
+	List<FoodItem> filteredByNutrientList; //list to hold filteredByNutrient items
+	List<FoodItem> filteredByNameList; //list to hold filteredByName items
 	
+	//initialize mealObservableList
 	ObservableList<FoodItem> mealObservableList = FXCollections.observableArrayList();
 	
-	FoodData foodData;
-	List<String> rulesList = new ArrayList<String>();
+	FoodData foodData; // field for food data
+	List<String> rulesList = new ArrayList<String>(); //hold our query rules
 	
-	ListView<FoodItem> mealListView;
-	TextField foodInput,calorieInput, nameFilter;
-	MenuBar dropMenu;
-	VBox vBoxRight;
-	Label foodCountLabel;
-	Stage rulesStage;
-	Stage addFoodWindow;
-	String nameQuery;
+	ListView<FoodItem> mealListView; //field for the mealListView
+	TextField foodInput,calorieInput, nameFilter; //textFields
+	
+	MenuBar dropMenu; //drop menu to help with fileds
+	VBox vBoxRight; //shows up on right side of our screen
+	Label foodCountLabel; //counts total food in list
+	Stage rulesStage; //stage to show our rules
+	Stage addFoodWindow; //stage to add the food
+	String nameQuery; //name query the user enters
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -69,20 +76,24 @@ public class Main extends Application {
 			primaryStage.setTitle("Food Query");
 			BorderPane root = new BorderPane();
 			VBox vBoxLeft = new VBox();
-			HBox hbox = new HBox();
 			HBox hbox2 = new HBox();
 			Scene scene = new Scene(root,1000,720);
 			
+			//Set how big we want the listView to be
 			foodListView = new ListView<>();
+			foodListView.setPrefHeight(700);
+			foodListView.setPrefWidth(350);
+			
 			foodInput = new TextField();
 			nameFilter = new TextField();
 			
-			// Left Vertical Box - Meal List
+			// Right Vertical Box - Meal List
 			vBoxRight = new VBox();
 
 			Label mealListLabel = new Label("Meal List");
 			mealListLabel.setStyle("-fx-font: 24 segoeui;");
 			
+			//Set our preferences on the mealListView
 			mealListView = new ListView<>();
 			mealListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			mealListView.setPrefHeight(700);
@@ -92,10 +103,10 @@ public class Main extends Application {
 			Button delMealItemButton = new Button("Delete Food");
 			Button calculateSummaryButton = new Button("Calculate Summary");
 			
+			//when we delete a meal item, we want to get all the selected
+			//items from the meal list and remove them from our observable list
 			delMealItemButton.setOnAction(e -> {
 				ObservableList<FoodItem> delItems = mealListView.getSelectionModel().getSelectedItems();
-				//mealObservableList.removeAll(delItems);
-				//System.out.println(delItems.size());
 				Object[] foodArray = delItems.toArray();
 				
 				for(Object food : foodArray) {
@@ -119,10 +130,11 @@ public class Main extends Application {
 			Label totalFiberLabel = new Label("Total Fiber: ");
 			Label totalProteinLabel = new Label("Total Protein: ");
 			
+			//Calculate the summary information of the mealList
 			calculateSummaryButton.setOnAction(e -> {
 				List<FoodItem> calculateList = mealObservableList;
 				
-				Double[] results = MealSummary.calculateNutrients(calculateList);
+				Double[] results = FoodListOperations.calculateNutrients(calculateList);
 				
 				calorieSummaryLabel.setText(Double.toString(results[0]));
 				fatSummaryLabel.setText(Double.toString(results[1]));
@@ -141,6 +153,7 @@ public class Main extends Application {
 			HBox fiberHBox = new HBox();
 			HBox proteinHBox = new HBox();
 			
+			//Set our nutrition summary hboxes and labels
 			calorieHBox.getChildren().add(totalCalorieLabel);
 			calorieHBox.getChildren().add(calorieSummaryLabel);
 			fatHBox.getChildren().add(totalFatLabel);
@@ -152,6 +165,7 @@ public class Main extends Application {
 			proteinHBox.getChildren().add(totalProteinLabel);
 			proteinHBox.getChildren().add(proteinSummaryLabel);
 			
+			//Set our right vbox for the mealList Nodes
 			vBoxRight.getChildren().add(mealListLabel);
 			vBoxRight.getChildren().add(mealListView);
 			vBoxRight.getChildren().add(delMealItemButton);
@@ -168,12 +182,8 @@ public class Main extends Application {
 			dropMenu = new MenuBar();
 			Menu menuFile = new Menu("File");
 			Menu menuHelp = new Menu("Help");
-			menuFile.setOnShowing(e -> {  }); // TODO: Add events
-			menuFile.setOnShown  (e -> {  });
-			menuFile.setOnHiding (e -> {  });
-			menuFile.setOnHidden (e -> {  });
 			MenuItem menuFoodList = new MenuItem("Open FoodList File...");
-			MenuItem menuSaveList = new MenuItem("Save FoodList");
+			MenuItem menuSaveList = new MenuItem("Save FoodList...");
 			MenuItem menuHelpItem = new MenuItem("Show Instructions");
 			
 			menuFile.getItems().add(menuFoodList);
@@ -187,10 +197,15 @@ public class Main extends Application {
 				File saveFile = fileChooser.showSaveDialog(primaryStage);
 				
 				if(saveFile == null) {
+					//If they didn't pick a file, don't proceed!
 					return;
 				}
 				
 				if(foodObservableList != null) {
+					
+					//make a new foodData class so that we can
+					//save exclusively what is in the observableList
+					//instead of all of the food that has been loaded ever
 					FoodData savedData = new FoodData();
 					
 					for(FoodItem food : foodObservableList) {
@@ -200,26 +215,42 @@ public class Main extends Application {
 					savedData.saveFoodItems(saveFile.getAbsolutePath());
 				}
 				else {
+					//if we have no food, we can't save
 					displayErrorMessage("There is no food to save!");
 				}
 			});
 			
+			/**
+			 * Action event for loading a file
+			 * 
+			 */
 			menuFoodList.setOnAction(e -> {
 			    File selectedFile = fileChooser.showOpenDialog(primaryStage);
 				if(selectedFile != null) {
 				    String filePath = selectedFile.getAbsolutePath();
 					
+				    //make a new food data and load in items
 					foodData = new FoodData();
 					foodData.loadFoodItems(filePath);
+					//set the observable list
 					foodObservableList = FXCollections.observableArrayList(foodData.getAllFoodItems());
+					
+					//filtered lists should be the whole list, nothing to filter right away
 					filteredByNutrientList = foodData.getAllFoodItems();
 					filteredByNameList = foodData.getAllFoodItems();
+					//want our food list view to be sorted
 					foodListView.setItems(foodObservableList.sorted());
+					//bind our food count label to the amount of items in the listView
 					foodCountLabel.textProperty().bind((Bindings.size(foodObservableList).asString()));
+					//clear out all rules
 					rulesList.clear();
+					nameQuery = null;
 				}
 			});
 			
+			/**
+			 * Event for when the user wants to see instructions
+			 */
 			menuHelpItem.setOnAction(e -> {
 				Stage instructionStage = new Stage();
 				BorderPane instructionPane = new BorderPane();
@@ -228,8 +259,8 @@ public class Main extends Application {
 						+ " Add food items by clicking on the Add New Food button. You can filter the food items by entering "
 						+ "a letter/phrase to search for. You can also filter food items by nutritional content. Enter a rule"
 						+ " by entering three things separated by spaces: <nutrient name> <comparator> <value>. The comparators are ="
-						+ ",<=, and >=. You can add as many rules as you want by entering each one, then pressing apply."
-						+ " To clear the filters, press the corresponding clear button. To add food items to the meal list, select them and hit send to meal.";
+						+ ",<=, and >=. You can add as many rules as you want by entering each one, then pressing add."
+						+ " To clear all queries at once, press the corresponding clear label. To add food items to the meal list, select them and hit send to meal.";
 				instructionLabel.setWrapText(true);
 				instructionLabel.setText(instructions);
 				instructionPane.setTop(instructionLabel);
@@ -241,10 +272,15 @@ public class Main extends Application {
 			
 			dropMenu.getMenus().addAll(menuFile, menuHelp);
 			HBox dropMenuPanel = new HBox(dropMenu);
+			
+			//We want our selection model to be multiple to allow for ctrl-A
 			foodListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 			foodListView.setPrefHeight(700);
 			foodInput.setPromptText("food");
 			nameFilter.setPromptText("Enter name search");
+			
+			//Create the buttons that display to the right side of
+			//the foodListView
 			VBox addNewFoodSendToMeal = new VBox();
 			Button addFood = new Button("Add New Food");
 			Button sendToMeal = new Button("Send to Meal");
@@ -255,20 +291,32 @@ public class Main extends Application {
 			
 			addNewFoodSendToMeal.getChildren().addAll(addFood, sendToMeal,showRules,applyAllQueries);
 			
+			/**
+			 * Applies the nutrient queries to the list view
+			 * Obtain the list of food that meets all the nutrient queries
+			 * This is returned from the BPTree
+			 * 
+			 */
 			applyAllQueries.setOnAction(e -> {
-				if(foodData != null) {
+				if(foodData != null && !rulesList.isEmpty()) {
 					List<List<FoodItem>> listsToIntersect = new ArrayList<List<FoodItem>>();
 					filteredByNutrientList = foodData.filterByNutrients(rulesList);
+					
+					//intersect the nameList and the nutrientList, we want
+					//both queries to apply at the same time
 					if(filteredByNameList != null && filteredByNutrientList != null) {
 						listsToIntersect.add(filteredByNameList);
 						listsToIntersect.add(filteredByNutrientList);
-						List<FoodItem> intersection = MealSummary.intersectLists(listsToIntersect);
+						List<FoodItem> intersection = FoodListOperations.intersectLists(listsToIntersect);
 						
 						foodObservableList.setAll(intersection);
 					}
 				}
 			});
 			
+			/**
+			 * Filter the foodListView by a text query (name contains)
+			 */
 			nameFilterButton.setOnAction(e -> {
 				String inputText = nameFilter.getText();
 				nameQuery = inputText;
@@ -277,16 +325,22 @@ public class Main extends Application {
 					List<List<FoodItem>> listsToIntersect = new ArrayList<List<FoodItem>>();
 					listsToIntersect.add(filteredByNameList);
 					listsToIntersect.add(filteredByNutrientList);
-					List<FoodItem> intersection = MealSummary.intersectLists(listsToIntersect);
+					List<FoodItem> intersection = FoodListOperations.intersectLists(listsToIntersect);
 					
 					foodObservableList.setAll(intersection);
 				}
 				else {
+					//If there is no food data, we can't filter any food!
 					displayErrorMessage("There is no food to filter!");
 				}
 				
 			});
 			
+			/**
+			 * When the user wants to remove the name filter, we
+			 * change the observable list to focus only on those items filteredByNutrient
+			 * we also reset the filteredByName list to be the whole list
+			 */
 			removeNameFilterButton.setOnAction(e -> {
 				nameQuery = null;
 				if(filteredByNameList != null && foodObservableList != null) {
@@ -301,7 +355,11 @@ public class Main extends Application {
 				mealObservableList.addAll(addItems);
 				
 			});
+			
+			//Bring up a new window with the rulesList
 			showRules.setOnAction((ActionEvent e) ->{
+				//If the user already has a rulesStage open
+				//close the existing one so they can't open infinitely many
 				if(rulesStage != null) {
 					rulesStage.close();
 				}
@@ -315,34 +373,17 @@ public class Main extends Application {
 				Button deleteRule = new Button("Delete Rule");
 				vbox.getChildren().addAll(rulesView,deleteRule);
 				
+				//Delete a rule from the rules listView
 				deleteRule.setOnAction(f -> {
-					for(String rule : rulesList) {
-						System.out.print(rule);
-					}
 					System.out.println();
 					List<String> selectedRules = rulesView.getSelectionModel().getSelectedItems();
 					observableRules.removeAll(selectedRules);
-					
-					for(String rule : rulesList) {
-						System.out.print(rule);
-					}
-					System.out.println();
-					
-					/*
-					if(foodData != null) {
-						filteredByNutrientList = foodData.filterByNutrients(rulesList);
-						
-						List<List<FoodItem>> foodLists = new ArrayList<List<FoodItem>>();
-						foodLists.add(filteredByNutrientList);
-						foodLists.add(filteredByNameList);
-						foodObservableList.setAll(FXCollections.observableList(MealSummary.intersectLists(foodLists)));
-					}
-					*/
 					if(observableRules.isEmpty()) {
 						rulesStage.close();
 					}
 				});
 				
+				//Show our rules scene
 				Scene ruleScene = new Scene(rulePane, 350, 700);
 				rulesStage.setTitle("Rules");
 				rulesStage.setScene(ruleScene);
@@ -510,6 +551,10 @@ public class Main extends Application {
 				}
 			});
 			
+			/**
+			 * when the user wants to clear all nutrient queries, we clear
+			 * the rules list and reset the filteredByNutrientList to be the whole food
+			 */
 			clearNutrientQuery.setOnAction(e -> {
 				if(rulesStage != null) {
 					rulesStage.close();
@@ -517,10 +562,8 @@ public class Main extends Application {
 				rulesList.clear();
 				if(foodObservableList != null && filteredByNutrientList != null) {
 					filteredByNutrientList = foodData.getAllFoodItems();
+					//now we display only the food filtered by name, if any
 					foodObservableList.setAll(filteredByNameList);
-					for(FoodItem food : filteredByNameList) {
-						System.out.println(food.getID());
-					}
 				}
 			});
 			
@@ -541,10 +584,8 @@ public class Main extends Application {
 		    
 		    addNewFoodSendToMeal.getChildren().add(foodCountListLabels);
 		    
-		    //POPUP FOR INSTRUCTIONS
-		    
-
-			//spacing and padding start
+		  
+			//SET THE STYLING AND FORMATTING HERE!!
 		    
 		    foodCountListLabels.setPadding(new Insets(10,0,0,10));
 		    foodCountListLabels.setSpacing(10);
@@ -571,17 +612,20 @@ public class Main extends Application {
 			//command sets color of list view
 			foodListView.setStyle("-fx-control-inner-background: #DCF3FF");	
 			 //sets style for background for the entire box
-		    vBoxLeft.setStyle("-fx-background-color: #7aadff");
+		    
+			vBoxLeft.setStyle("-fx-background-color: #7aadff");
 		    dropMenuPanel.setStyle("-fx-background-color: #7aadff");
 		    vBoxRight.setStyle("-fx-background-color: #7aadff");
 		    mealListView.setStyle("-fx-control-inner-background: #DCF3FF");
 		    
+		    //put file chooser at top, foodList stuff on left
+		    //mealList stuff on right
 		    
 		    root.setTop(dropMenuPanel);
 		    root.setLeft(vBoxLeft);
 		    root.setRight(vBoxRight);
 		    
-
+		    //sets the color of our center
 		    HBox centerBox = new HBox();
 		    centerBox.setStyle("-fx-background-color: #7aadff");
 		    root.setCenter(centerBox);
@@ -595,6 +639,10 @@ public class Main extends Application {
 		}
 	}
 	
+	/**
+	 * Method to display a given string as a popup error message
+	 * @param errorText
+	 */
 	private void displayErrorMessage(String errorText) {
 		
 		Alert errorAlert = new Alert(AlertType.ERROR);
