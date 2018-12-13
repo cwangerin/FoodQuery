@@ -34,8 +34,11 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     
     /**
      * Public constructor
+     *
+     * Initializes the BPTree with a root and the given branching factor
+     * New root must be a LeafNode
      * 
-     * @param branchingFactor 
+     * @param branchingFactor The given branching factor of the tree (>2)
      */
     public BPTree(int branchingFactor) {
         if (branchingFactor <= 2) {
@@ -55,7 +58,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
      */
     @Override
     public void insert(K key, V value) {
-      
     	root.insert(key, value);
     	
     }
@@ -68,14 +70,16 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
      * @see BPTreeADT#rangeSearch(java.lang.Object, java.lang.String)
      */
     @Override
-    public List<V> rangeSearch(K key, String comparator) {
-        if (!comparator.contentEquals(">=") && 
-            !comparator.contentEquals("==") && 
-            !comparator.contentEquals("<=") )
-            return new ArrayList<V>();
-        // TODO : Complete
-        return root.rangeSearch(key, comparator);
-    }
+	public List<V> rangeSearch(K key, String comparator) {
+		// Return just an empty list if the comparator is invalid or if the key is invalid.
+		if (!comparator.contentEquals(">=") && !comparator.contentEquals("==") && !comparator.contentEquals("<="))
+			return new ArrayList<V>();
+		if (key == null) {
+			return new ArrayList<V>();
+		}
+
+		return root.rangeSearch(key, comparator);
+	}
     
     
     /*
@@ -127,11 +131,11 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         
         /**
          * Package constructor
+         * 
+         * A node will always have a list of keys in order to hold the keys.
          */
         Node() {
-            // TODO : Complete
-        	
-        	keys = new ArrayList<K>();
+            keys = new ArrayList<K>();
         }
         
         /**
@@ -190,19 +194,19 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         
         /**
          * Package constructor
+         * 
+	 	 * Initialize the InternalNode's list of keys and children.
          */
         InternalNode() {
             super();
             children = new ArrayList<Node>();
-            // TODO : Complete
         }
         
         /**
-         * (non-Javadoc)
+         * Gets the first leaf key of the child in the first position.
          * @see BPTree.Node#getFirstLeafKey()
          */
         K getFirstLeafKey() {
-            // TODO : Complete
             return children.get(0).getFirstLeafKey();
         }
         
@@ -211,9 +215,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#isOverflow()
          */
         boolean isOverflow() {
-            // TODO : Complete
         	
-        	if(children.size() > branchingFactor) {
+        	if (children.size() > branchingFactor) {
         		return true;
         	}
         	else {
@@ -226,60 +229,85 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#insert(java.lang.Comparable, java.lang.Object)
          */
         void insert(K key, V value) {
-            // TODO : Complete
+        	/*
+        	 * Method variables:
+        	 * int correctIndex holds the correct index in which a key should go into the keys list.
+        	 * Node child holds the child in which to insert a key, value pair into.
+        	 * Node sibling holds the new sibling of the split node.
+        	 * K promotedKey holds the key that is supposed to be placed into the node's parent.
+        	 * InternalNode newRoot holds the new root if the original root has to be split.
+        	 */
         	
+        	// binarySearch is used to find where a key should go in the list. 
         	int correctIndex = Collections.binarySearch(keys, key);
+        	// If the index is negative, it shows the position where it would go if it were added.
         	if(correctIndex < 0) {
+        		// Reversing the negative so that it can be successfully placed in list.
         		correctIndex = (-1)*(correctIndex+1);
         	}
         	
+        	// Gets the correct child and then inserts the key, value pair.
         	Node child = children.get(correctIndex);
-        	
         	child.insert(key, value);
         	
+        	// Checking if the child that we inserted the key, value into has over-flown.
         	if(child.isOverflow()) {
+        		// Splitting the node and getting the sibling.
         		Node sibling = child.split();
         		K promotedKey = sibling.getFirstLeafKey();
         		
+        		// Obtaining the position to promote the key to.
         		int correctIndex2 = Collections.binarySearch(keys, promotedKey);
         		if(correctIndex2 < 0) {
         			correctIndex2 = (-1)*(correctIndex2 +1);
         		}
         		
+        		// Finally, add promoted key to the parents and then sibling to the children.
         		keys.add(correctIndex2, promotedKey);
         		children.add(correctIndex2 +1, sibling);
         		
         	}
         	
+        	// Next, must check if the root has over-flown.
         	if(root.isOverflow()) {
-        		Node sibling = split();
         		InternalNode newRoot = new InternalNode();
+        		
+        		// Splitting the node, and then adding both sides to the new root node.
+        		Node sibling = split();
         		newRoot.keys.add(sibling.getFirstLeafKey());
         		newRoot.children.add(this);
         		newRoot.children.add(sibling);
+        		
+        		// The new root node becomes the new root.
         		root = newRoot;
         	}
-        	
         }
-        
         
         /**
          * (non-Javadoc)
          * @see BPTree.Node#split()
          */
         Node split() {
-            // TODO : Complete
-        	int keySize = keys.size();
+        	/*
+        	 * Method variables:
+        	 * int keySize holds the number of keys in the keys list.
+        	 * int startingIndex holds the index where the split occurs.
+        	 * int endingIndex holds the last index.
+        	 * InternalNode sibling holds the data from splitting the node.
+        	 */
         	
+        	InternalNode sibling = new InternalNode();
+        	int keySize = keys.size();
         	int startingIndex = keySize / 2 + 1;
         	int endingIndex = keySize;
-        	InternalNode sibling = new InternalNode();
+        	
+        	// Adding the keys and children that were split from the current node to the sibling.
         	sibling.keys.addAll(keys.subList(startingIndex, endingIndex));
         	sibling.children.addAll(children.subList(startingIndex, endingIndex+1));
         	
+        	// Removing the keys and children in current node that were split from the current node.
         	keys.subList(startingIndex-1, endingIndex).clear();
         	children.subList(startingIndex, endingIndex + 1).clear();
-        	
         	
             return sibling;
         }
@@ -289,16 +317,28 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#rangeSearch(java.lang.Comparable, java.lang.String)
          */
         List<V> rangeSearch(K key, String comparator) {
+        	/*
+        	 * Method variables:
+        	 * Node lowestChild holds the child in the lowest index position.
+        	 * Node highestChild holds the child in the last index position.
+        	 * int index holds the index that the key should be found within the keys.
+        	 * Node child holds the child at the index.
+        	 */
+        	
+        	// Go down left (lowest) child for <=.
             if(comparator.contentEquals("<=")) {
             	Node lowestChild = children.get(0);
             	return lowestChild.rangeSearch(key, comparator);
             	
             }
+            // Go down right (highest) child for >=.
             else if(comparator.contentEquals(">=")) {
             	Node highestChild = children.get(children.size()-1);
             	return highestChild.rangeSearch(key, comparator);
             }
+            // Find where to go down if ==.
             else if(comparator.contentEquals("==")) {
+            	// binarySearch is used to find the correct index.
             	int index = Collections.binarySearch(keys, key);
             	if(index < 0) {
             		index = -1*(index+1);
@@ -307,7 +347,8 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
             	return child.rangeSearch(key, comparator);
             }
             
-            return null;
+            // Should never be reached, because we test for potential invalids previous to this.
+            return new ArrayList<V>();
         }
     
     } // End of class InternalNode
@@ -334,11 +375,12 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         
         /**
          * Package constructor
+         * 
+         * Initialize the LeafNode with a keys and values list.
          */
         LeafNode() {
             super();
             values = new ArrayList<V>();
-            // TODO : Complete
         }
         
         
@@ -347,7 +389,6 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#getFirstLeafKey()
          */
         K getFirstLeafKey() {
-            // TODO : Complete
             return keys.get(0);
         }
         
@@ -356,9 +397,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#isOverflow()
          */
         boolean isOverflow() {
-            // TODO : Complete
-        	
-        	if(values.size() == branchingFactor) {
+            if(values.size() == branchingFactor) {
         		return true;
         	}
         	else {
@@ -372,30 +411,46 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#insert(Comparable, Object)
          */
         void insert(K key, V value) {
-            // TODO : Complete
-        	//Find key to insert at
-        	Iterator<K> keyIterator = keys.iterator();
+            /*
+             * Method variables:
+             * Iterator<K> keyIterator is an iterator over the keys list.
+             * int correctIndex holds the correct index to insert a key, value pair into.
+             * Node sibling holds the sibling node that is created by a split.
+             * InternalNode newRoot holds the node that will become the new root after a split.
+             */
         	
+        	// Find key to insert at and add key.
+        	Iterator<K> keyIterator = keys.iterator();
         	if(!keyIterator.hasNext()) {
         		keys.add(key);
         		values.add(value);
         	}
         	else {
-        		
+        		// Finding the correct index to insert key into.
         		int correctIndex = Collections.binarySearch(keys, key);
         		if(correctIndex < 0) {
         			correctIndex = -1*(correctIndex+1);
         		}
+        		
 	        	keys.add(correctIndex, key);
 	        	values.add(correctIndex, value);
         	}
         	
+        	// Must check if the root has over-flown.
         	if(root.isOverflow()) {
-        		Node sibling = split();
         		InternalNode newRoot = new InternalNode();
+        		
+        		// Stores the sibling made from splitting the root node.
+        		Node sibling = split();
+        		
+        		// Adding the key that should be placed into the parents.
         		newRoot.keys.add(sibling.getFirstLeafKey());
+        		
+        		// Adding the two split nodes to the root as children.
         		newRoot.children.add(this);
         		newRoot.children.add(sibling);
+        		
+        		// newRoot becomes the new root now.
         		root = newRoot;
         	}
         }
@@ -405,19 +460,28 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#split()
          */
         Node split() {
-            // TODO : Complete
-        	
+        	/*
+        	 * Method variables:
+        	 * LeafNode siblingNode holds the split node's sibling.
+        	 * int keySize holds the size of the keys list.
+        	 * int startingIndex holds the index that the split should occur at.
+        	 * int endingIndex holds the end index of the split.
+        	 */
+
         	LeafNode siblingNode = new LeafNode();
         	int keySize = keys.size();
         	int startingIndex = (keySize + 1) / 2;
         	int endingIndex = keySize;
         	
+        	// Adding the split keys and values to the newly created sibling. 
         	siblingNode.keys.addAll(keys.subList(startingIndex, endingIndex));
         	siblingNode.values.addAll(values.subList(startingIndex, endingIndex));
         	
+        	// Clearing the already split keys and values from the current node.
         	keys.subList(startingIndex, endingIndex).clear();
         	values.subList(startingIndex, endingIndex).clear();
         	
+        	// Re-setting the LeafNode links.
         	if(next != null) {
         		next.previous = siblingNode;
         	}
@@ -435,11 +499,21 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
          * @see BPTree.Node#rangeSearch(Comparable, String)
          */
         List<V> rangeSearch(K key, String comparator) {
-            // TODO : Complete
+        	/*
+        	 * Method variables:
+        	 * List<V> masterList is the cumulative list of values that fall into the comparator's range.
+        	 * LeafNode curNode holds the current node that we are in.
+        	 * LeafNode temp temporarily holds the current node that we are in.
+        	 */
+        	
         	List<V> masterList = new ArrayList<V>();
+        	
         	if(comparator.contentEquals("<=")) {
         		LeafNode curNode = this;
+        		
+        		// Continue to go to the next node while there's still nodes.
         		while(curNode != null && key.compareTo(curNode.getFirstLeafKey()) >= 0) {
+        			// Comparing the individual keys.
         			for(K k : curNode.keys) {
         				if(k.compareTo(key) <= 0) {
         					masterList.add(curNode.values.get(curNode.keys.indexOf(k)));
@@ -450,15 +524,21 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		
         		return masterList;
         	}
+        	
         	else if(comparator.contentEquals(">=")) {
         		LeafNode curNode = this;
+        		
+        		// Continue to go to the previous node while there's still nodes.
         		while(curNode != null && key.compareTo(curNode.keys.get(curNode.keys.size()-1)) <= 0) {
         			List<K> reversedKeys = new ArrayList<K>(curNode.keys);
         			List<V> reversedValues = new ArrayList<V>(curNode.values);
+        			
+        			// Using reverse in order to get to the end of the list, then traverse back.
         			Collections.reverse(reversedKeys);
         			Collections.reverse(reversedValues);
         			
         			for(K k : reversedKeys) {
+        				// Comparing the individual keys.
         				if(k.compareTo(key) >= 0) {
         					masterList.add(reversedValues.get(reversedKeys.indexOf(k)));
         				}
@@ -471,9 +551,13 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
         		Collections.reverse(masterList);
         		return masterList;
         	}
+        	
         	else if(comparator.contentEquals("==")) {
         		LeafNode temp = this;
+        		
+        		// Continue to go through nodes.
         		while(temp != null && key.compareTo(temp.getFirstLeafKey()) >= 0) {
+        			// Comparing the individual keys.
 	        		for(K k : temp.keys) {
 	        			if(k.compareTo(key) == 0) {
 	        				masterList.add(temp.values.get(temp.keys.indexOf(k)));
@@ -500,7 +584,7 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     public static void main(String[] args) {
         // create empty BPTree with branching factor of 3
         //BPTree<Double, Double> bpTree = new BPTree<>(3);
-    	BPTree<Integer, Integer> bpTree2 = new BPTree<>(3);
+//    	BPTree<Integer, Integer> bpTree2 = new BPTree<>(3);
         
         /*
         // create a pseudo random number generator
@@ -541,31 +625,31 @@ public class BPTree<K extends Comparable<K>, V> implements BPTreeADT<K, V> {
     		System.out.println("\n\nTree structure: \n" + bpTree2.toString());
     	}
     	*/
+//    	BPTree<Integer, Integer> bpTree2 = new BPTree<>(3);
+//		System.out.println(bpTree2);
+//    	Random randGen = new Random();
+//    	for(int i = 0; i < 100; i++) {
+//    		int randomInt = randGen.nextInt(100);
+//    		bpTree2.insert(randomInt, randomInt);
+//    		if(Math.random() > 0.5) {
+//    			bpTree2.insert(randomInt, randomInt);
+//    		}
+//    		System.out.println("\nTree structure: \n" + bpTree2.toString());
+//    	}
     	
-    	Random randGen = new Random();
-    	for(int i = 0; i < 100; i++) {
-    		int randomInt = randGen.nextInt(100);
-    		bpTree2.insert(randomInt, randomInt);
-    		if(Math.random() > 0.5) {
-    			bpTree2.insert(randomInt, randomInt);
-    		}
-    		
-    		System.out.println("\n\nTree structure: \n" + bpTree2.toString());
-    	}
     	
-    	
-    	bpTree2.insert(2,2);
-    	bpTree2.insert(2, 2);
-    	bpTree2.insert(2,2);
-    	bpTree2.insert(1, 1);
-    	bpTree2.insert(3, 3);
-    	bpTree2.insert(0, 0);
-    	bpTree2.insert(0, 0);
-    	System.out.println("\n\nTree structure: \n" + bpTree2.toString());
-    	
-    	System.out.println(bpTree2.rangeSearch(16, "<="));
-    	System.out.println(bpTree2.rangeSearch(1,">="));
-    	System.out.println(bpTree2.rangeSearch(2, "=="));
+//    	bpTree2.insert(2,2);
+//    	bpTree2.insert(2, 2);
+//    	bpTree2.insert(2,2);
+//    	bpTree2.insert(1, 1);
+//    	bpTree2.insert(3, 3);
+//    	bpTree2.insert(0, 0);
+//    	bpTree2.insert(0, 0);
+//    	System.out.println("\n\nTree structure: \n" + bpTree2.toString());
+//    	
+//    	System.out.println(bpTree2.rangeSearch(16, "<="));
+//    	System.out.println(bpTree2.rangeSearch(1,">="));
+//    	System.out.println(bpTree2.rangeSearch(2, "=="));
     }
 
 } // End of class BPTree
