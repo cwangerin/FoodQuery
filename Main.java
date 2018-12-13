@@ -531,6 +531,9 @@ public class Main extends Application {
 			    		String nutrient = ruleArray[0];
 			    		String comparator = ruleArray[1];
 			    		Double value = Double.parseDouble(ruleArray[2]);
+			    		if(value < 0) {
+			    			displayErrorMessage("Can't enter negative nutrition values!");
+			    		}
 			    		
 			    		if(!(comparator.contentEquals("<=") || comparator.contentEquals("==") ||
 			    				comparator.contentEquals(">="))) {
