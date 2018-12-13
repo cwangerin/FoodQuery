@@ -69,6 +69,7 @@ public class Main extends Application {
 	Stage rulesStage; //stage to show our rules
 	Stage addFoodWindow; //stage to add the food
 	String nameQuery; //name query the user enters
+	Button sendToMeal; //sendToMeal button
 	
 	@Override
 	public void start(Stage primaryStage) {
@@ -245,6 +246,7 @@ public class Main extends Application {
 					//clear out all rules
 					rulesList.clear();
 					nameQuery = null;
+					sendToMeal.disableProperty().bind(Bindings.size(foodObservableList).isEqualTo(0));
 				}
 			});
 			
@@ -283,10 +285,14 @@ public class Main extends Application {
 			//the foodListView
 			VBox addNewFoodSendToMeal = new VBox();
 			Button addFood = new Button("Add New Food");
-			Button sendToMeal = new Button("Send to Meal");
+			sendToMeal = new Button("Send to Meal");
+			sendToMeal.setDisable(true);
 			Button showRules = new Button("Show Rules");
 			Button applyAllQueries = new Button("Apply All Rules");
 			Button nameFilterButton = new Button("Apply Name Filter");
+			
+			applyAllQueries.setDisable(true); //can't do any queries from the beginning
+			
 			Button removeNameFilterButton = new Button("Remove Name Filter");
 			
 			addNewFoodSendToMeal.getChildren().addAll(addFood, sendToMeal,showRules,applyAllQueries);
@@ -343,6 +349,7 @@ public class Main extends Application {
 			 */
 			removeNameFilterButton.setOnAction(e -> {
 				nameQuery = null;
+				nameFilter.clear(); //clear text since the filter is gone
 				if(filteredByNameList != null && foodObservableList != null) {
 					filteredByNameList = foodData.getAllFoodItems();
 					foodObservableList.setAll(filteredByNutrientList);
@@ -378,7 +385,14 @@ public class Main extends Application {
 					System.out.println();
 					List<String> selectedRules = rulesView.getSelectionModel().getSelectedItems();
 					observableRules.removeAll(selectedRules);
-					if(observableRules.isEmpty()) {
+					if(observableRules.isEmpty() && foodData != null) {
+						filteredByNutrientList = foodData.getAllFoodItems();
+						if(nameQuery == null) {
+							filteredByNameList = foodData.getAllFoodItems();
+						}
+						
+						foodObservableList.setAll(filteredByNameList);
+						applyAllQueries.setDisable(true);
 						rulesStage.close();
 					}
 				});
@@ -462,9 +476,17 @@ public class Main extends Application {
 						      else {
 							      foodData.addFoodItem(foodItem);
 							      foodObservableList.add(foodItem);
-							      filteredByNutrientList = foodData.filterByNutrients(rulesList);
+							      if(!rulesList.isEmpty()) {
+							    	  filteredByNutrientList = foodData.filterByNutrients(rulesList);
+							      }
+							      else {
+							    	  filteredByNutrientList = foodData.getAllFoodItems();
+							      }
 							      if(nameQuery != null) {
 							    	  filteredByNameList = foodData.filterByName(nameQuery);
+							      }
+							      else {
+							    	  filteredByNameList = foodData.getAllFoodItems();
 							      }
 						      }
 						      
@@ -472,7 +494,7 @@ public class Main extends Application {
 					      }
 					      
 					     }catch(NumberFormatException j){
-					    	 displayErrorMessage("You must enter numeric nutrition values");
+					    	 displayErrorMessage("You must enter non-negative numeric nutrition values, a name, and a unique id.");
 					     }
 					 
 				});
@@ -501,7 +523,7 @@ public class Main extends Application {
 					return;
 				}
 				
-				String textInput = nutrientQueryText.getText();
+				String textInput = nutrientQueryText.getText().toLowerCase();
 				nutrientQueryText.clear();
 				boolean validInput = true;
 				try {
@@ -548,6 +570,7 @@ public class Main extends Application {
 				
 				if(validInput) {
 					rulesList.add(textInput);
+					applyAllQueries.setDisable(false);
 				}
 			});
 			
@@ -560,6 +583,7 @@ public class Main extends Application {
 					rulesStage.close();
 				}
 				rulesList.clear();
+				applyAllQueries.setDisable(true);
 				if(foodObservableList != null && filteredByNutrientList != null) {
 					filteredByNutrientList = foodData.getAllFoodItems();
 					//now we display only the food filtered by name, if any
