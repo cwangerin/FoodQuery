@@ -382,7 +382,6 @@ public class Main extends Application {
 				
 				//Delete a rule from the rules listView
 				deleteRule.setOnAction(f -> {
-					System.out.println();
 					List<String> selectedRules = rulesView.getSelectionModel().getSelectedItems();
 					observableRules.removeAll(selectedRules);
 					if(observableRules.isEmpty() && foodData != null) {
@@ -441,7 +440,6 @@ public class Main extends Application {
 				submit.setOnAction(r -> {
 					 try {
 					      FoodItem foodItem = new FoodItem(foodID.getText(),foodName.getText());
-					      System.out.println(foodItem.getID());
 					      Double calories = Double.parseDouble(calorieCount.getText());
 					      Double fat = Double.parseDouble(fatGrams.getText());
 					      Double carbohydrate = Double.parseDouble(carbGrams.getText());
@@ -490,6 +488,7 @@ public class Main extends Application {
 							      }
 						      }
 						      
+						      sendToMeal.disableProperty().bind(Bindings.size(foodObservableList).isEqualTo(0));
 						      addFoodWindow.close();
 					      }
 					      
