@@ -1,6 +1,6 @@
 # D-Team 18 - Fall 2018 Team Project: Food Query and Meal Analyzer
 
-## Team Members:
+## Team Members (D-Team 18):
 * Bernard Rufinus - brufinus@wisc.edu
 * Caleb Wangerin - cwangerin@wisc.edu
 * Tim Heinzel - theinzel@wisc.edu
@@ -13,6 +13,8 @@
    - Add and clear a name filter
 3. The user can add foods to the Meal List by selecting a food in the Food List and then clicking "Send to Meal"
 4. The user can delete foods from the Meal List or calculate the summary of nutrients by pressing "Calculate Summary"
+
+
 - The user can also use keyboard shortcuts to select Food List and Meal List items effectively:
   - ctrl-A selects all the foods in the selected List
   - ctrl-click allows the user to select multiple separate items
