@@ -4,6 +4,7 @@
 * Bernard Rufinus - brufinus@wisc.edu
 * Caleb Wangerin - cwangerin@wisc.edu
 * Tim Heinzel - theinzel@wisc.edu
+* Aarish Mirza - aamirza2@wisc.edu
 
 ## Food Query GUI Instructions
 1. Click the top menu bar and select the option to open a FoodList file (.csv or .txt file only).
